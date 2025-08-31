@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lista de Usuários</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Lista de Usuários</h2>
+    <a th:href="@{/usuarios/novo}">Cadastrar Novo Usuário</a>
+    <table border="1">
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Tipo</th>
+            <th>Ações</th>
+        </tr>
+        <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.nome}"></td>
+            <td th:text="${usuario.email}"></td>
+            <td th:text="${usuario.status}"></td>
+            <td th:text="${usuario.tipo}"></td>
+            <td>
+                <form th:action="@{'/usuarios/status/' + ${usuario.id}}" method="post" style="display:inline;">
+                    <select name="status">
+                        <option th:selected="${usuario.status == 'ATIVO'}" th:value="ATIVO">Ativar</option>
+                        <option th:selected="${usuario.status == 'INATIVO'}" th:value="INATIVO">Inativar</option>
+                    </select>
+                    <button type="submit">Alterar</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
