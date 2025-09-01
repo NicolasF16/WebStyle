@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 
 @Controller
@@ -25,7 +26,7 @@ public class LoginController {
     public String login(@RequestParam String email,
                         @RequestParam String senha,
                         Model model,
-                        javax.servlet.http.HttpSession session) {
+                        jakarta.servlet.http.HttpSession session) { // MUDANÇA AQUI
         Optional<User> userOpt = userService.autenticar(email, senha);
         if (userOpt.isPresent()) {
             // Usuário autenticado, salva na sessão
