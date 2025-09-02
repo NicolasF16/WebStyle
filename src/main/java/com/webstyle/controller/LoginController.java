@@ -17,6 +17,12 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
+    // NOVO: Página inicial redireciona para login
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
     public String loginForm() {
         return "login";
@@ -26,7 +32,7 @@ public class LoginController {
     public String login(@RequestParam String email,
                         @RequestParam String senha,
                         Model model,
-                        jakarta.servlet.http.HttpSession session) { // MUDANÇA AQUI
+                        jakarta.servlet.http.HttpSession session) {
         Optional<User> userOpt = userService.autenticar(email, senha);
         if (userOpt.isPresent()) {
             // Usuário autenticado, salva na sessão

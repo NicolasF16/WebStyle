@@ -18,6 +18,13 @@
             <button type="submit">OK</button>
             <button type="reset">Cancelar</button>
         </form>
+        
+        <!-- NOVO: Link para cadastro de usuário -->
+        <div class="cadastro-link">
+            <p><a th:href="@{/usuarios/novo}">Não tem conta? Cadastre-se aqui</a></p>
+        </div>
+        
+        <!-- Mensagem de erro -->
         <div th:if="${erro}" class="error-message">
             <p th:text="${erro}"></p>
         </div>
