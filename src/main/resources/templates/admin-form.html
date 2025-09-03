@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <title>Cadastro de Admin</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
-
 <body>
     <div class="admin-container">
         <h2>Cadastro de Admin</h2>
@@ -23,7 +21,7 @@
             <label for="tipo">Grupo:</label>
             <select id="tipo" name="tipo" required>
                 <option value="">Selecione</option>
-                <option value="BACKOFFICE">Admin</option>
+                <option value="BACKOFFICE">Administrador</option>
                 <option value="EXTERNO">Estoquista</option>
             </select>
             
@@ -41,23 +39,25 @@
             <button type="button" onclick="window.location.href='/usuarios/novo'">Cancelar</button>
         </form>
         
+        <!-- Mensagem de erro -->
         <div th:if="${erro}" class="error-message">
             <p th:text="${erro}"></p>
         </div>
     </div>
-</body>
 
-<script>
-    function validarSenhas() {
-        var senha1 = document.getElementById('senha').value;
-        var senha2 = document.getElementById('senha2').value;
-        if (senha1 !== senha2) {
-            document.getElementById('erro-senha').style.display = 'block';
-            return false;
+    <script>
+        function validarSenhas() {
+            var senha1 = document.getElementById('senha').value;
+            var senha2 = document.getElementById('senha2').value;
+            
+            if (senha1 !== senha2) {
+                document.getElementById('erro-senha').style.display = 'block';
+                return false;
+            }
+            
+            document.getElementById('erro-senha').style.display = 'none';
+            return true;
         }
-        document.getElementById('erro-senha').style.display = 'none';
-        return true;
-    }
-</script>
-
+    </script>
+</body>
 </html>

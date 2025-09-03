@@ -19,9 +19,28 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User cadastrarUsuario(User user) {
+        // Verifica se email já existe
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("Email já cadastrado no sistema");
+        }
+        
+        // Valida se senhas são iguais (isso deve ser feito no frontend também)
+        if (user.getSenha() == null || user.getSenha().trim().isEmpty()) {
+            throw new RuntimeException("Senha é obrigatória");
+        }
+        
+        // Criptografa a senha
         user.setSenha(passwordEncoder.encode(user.getSenha()));
+        
+        // Define status como ATIVO por padrão
         user.setStatus(Status.ATIVO);
-        user.setTipo(TipoUsuario.BACKOFFICE); // padrão para exemplo
+        
+        // Se não especificado, define como EXTERNO (usuário comum)
+        if (user.getTipo() == null) {
+            user.setTipo(TipoUsuario.EXTERNO);
+        }
+        
         return userRepository.save(user);
     }
 
@@ -29,7 +48,10 @@ public class UserService {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            // Verifica se é usuário BACKOFFICE, está ativo e senha confere
+            
+            // Verifica se é usuário BACKOFFICE (apenas backoffice pode acessar o sistema)
+            // Verifica se está ativo
+            // Verifica se a senha confere
             if (user.getTipo() == TipoUsuario.BACKOFFICE &&
                 user.getStatus() == Status.ATIVO &&
                 passwordEncoder.matches(senha, user.getSenha())) {
@@ -49,6 +71,44 @@ public class UserService {
             User user = userOpt.get();
             user.setStatus(status);
             userRepository.save(user);
+        } else {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+    }
+
+    public User buscarPorId(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public User alterarUsuario(Long id, User usuarioAlterado) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            
+            // Permite alterar apenas nome, CPF e grupo (não email)
+            user.setNome(usuarioAlterado.getNome());
+            user.setCpf(usuarioAlterado.getCpf());
+            
+            // Só altera grupo se especificado
+            if (usuarioAlterado.getTipo() != null) {
+                user.setTipo(usuarioAlterado.getTipo());
+            }
+            
+            // Só altera senha se foi fornecida nova senha
+            if (usuarioAlterado.getSenha() != null && !usuarioAlterado.getSenha().trim().isEmpty()) {
+                // Valida se as duas senhas são iguais (deve ser validado no frontend)
+                user.setSenha(passwordEncoder.encode(usuarioAlterado.getSenha()));
+            }
+            
+            return userRepository.save(user);
+        } else {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+    }
+
+    public void validarSenhas(String senha1, String senha2) {
+        if (senha1 == null || senha2 == null || !senha1.equals(senha2)) {
+            throw new RuntimeException("As senhas não coincidem");
         }
     }
 }

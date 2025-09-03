@@ -1,15 +1,65 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Página Principal</title>
+    <title>Página Principal - WebStyle Backoffice</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-    <h2>Principal</h2>
-    <ul>
-        <li><a th:href="@{/produtos}">Listar Produto</a></li>
-        <li><a th:href="@{/usuarios}">Listar Usuário</a></li>
-        <li><span style="color:gray;">Listar Pedidos</span></li>
-    </ul>
+    <div class="main-container">
+        <h2>Sistema Backoffice - WebStyle</h2>
+        
+        <!-- Informações do usuário logado -->
+        <div class="user-info" th:if="${session.usuarioLogado}">
+            <p><strong>Usuário:</strong> <span th:text="${session.usuarioLogado.nome}"></span></p>
+            <p><strong>Grupo:</strong> <span th:text="${session.grupo == 'BACKOFFICE' ? 'Administrador' : 'Estoquista'}"></span></p>
+        </div>
+        
+        <ul>
+            <li><a th:href="@{/produtos}">Listar Produtos</a></li>
+            <li><a th:href="@{/usuarios}">Listar Usuário</a></li>
+            <li><span style="color:gray;">Listar Pedidos (Em desenvolvimento)</span></li>
+        </ul>
+        
+        <!-- Botão de logout -->
+        <div class="logout-section">
+            <a th:href="@{/login}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <style>
+        .user-info {
+            background: #f2f8ff;
+            border: 1px solid #0074d9;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .user-info p {
+            margin: 8px 0;
+            color: #333;
+        }
+        
+        .logout-section {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+    </style>
 </body>
 </html>

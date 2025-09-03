@@ -8,36 +8,93 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
-@RequestMapping("/usuarios")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public String listarUsuarios(Model model) {
+    // Lista todos os usuários cadastrados no sistema (para administrador)
+    @GetMapping("/usuarios")
+    public String listarUsuarios(Model model, HttpSession session) {
+        // Verifica se usuário está logado e é administrador
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            return "redirect:/login";
+        }
+        
         List<User> usuarios = userService.listarUsuarios();
         model.addAttribute("usuarios", usuarios);
         return "user-list";
     }
 
-    @GetMapping("/novo")
+    // Formulário para cadastrar novo usuário
+    @GetMapping("/usuarios/novo")
     public String novoUsuarioForm(Model model) {
         model.addAttribute("usuario", new User());
         return "user-form";
     }
 
-    @PostMapping
-    public String salvarUsuario(@ModelAttribute User usuario) {
-        userService.cadastrarUsuario(usuario);
+    // Cadastra novo usuário
+    @PostMapping("/cadastro")
+    public String cadastrarUsuario(@ModelAttribute User usuario, Model model) {
+        try {
+            userService.cadastrarUsuario(usuario);
+            return "redirect:/login";
+        } catch (Exception e) {
+            model.addAttribute("erro", "Erro ao cadastrar usuário: " + e.getMessage());
+            return "user-form";
+        }
+    }
+
+    // Altera status do usuário (ativo/inativo)
+    @PostMapping("/usuarios/status/{id}")
+    public String alterarStatus(@PathVariable Long id, @RequestParam Status status, HttpSession session) {
+        // Verifica se usuário está logado e é administrador
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            return "redirect:/login";
+        }
+        
+        userService.alterarStatus(id, status);
         return "redirect:/usuarios";
     }
 
-    @PostMapping("/status/{id}")
-    public String alterarStatus(@PathVariable Long id, @RequestParam Status status) {
-        userService.alterarStatus(id, status);
-        return "redirect:/usuarios";
+    // Formulário para alterar dados do usuário
+    @GetMapping("/usuarios/editar/{id}")
+    public String editarUsuarioForm(@PathVariable Long id, Model model, HttpSession session) {
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            return "redirect:/login";
+        }
+        
+        User usuario = userService.buscarPorId(id);
+        if (usuario == null) {
+            return "redirect:/usuarios";
+        }
+        
+        model.addAttribute("usuario", usuario);
+        return "user-edit";
+    }
+
+    // Salva alterações do usuário
+    @PostMapping("/usuarios/alterar/{id}")
+    public String alterarUsuario(@PathVariable Long id, @ModelAttribute User usuario, 
+                                Model model, HttpSession session) {
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            return "redirect:/login";
+        }
+        
+        try {
+            userService.alterarUsuario(id, usuario);
+            return "redirect:/usuarios";
+        } catch (Exception e) {
+            model.addAttribute("erro", "Erro ao alterar usuário: " + e.getMessage());
+            model.addAttribute("usuario", usuario);
+            return "user-edit";
+        }
     }
 }
