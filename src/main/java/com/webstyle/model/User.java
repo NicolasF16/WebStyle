@@ -1,4 +1,3 @@
-
 package com.webstyle.model;
 
 import jakarta.persistence.*;
