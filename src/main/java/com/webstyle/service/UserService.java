@@ -25,7 +25,7 @@ public class UserService {
             throw new RuntimeException("Email já cadastrado no sistema");
         }
         
-        // Valida se senhas são iguais (isso deve ser feito no frontend também)
+        // Valida se senhas são iguais 
         if (user.getSenha() == null || user.getSenha().trim().isEmpty()) {
             throw new RuntimeException("Senha é obrigatória");
         }
@@ -36,7 +36,7 @@ public class UserService {
         // Define status como ATIVO por padrão
         user.setStatus(Status.ATIVO);
         
-        // Se não especificado, define como EXTERNO (usuário comum)
+        
         if (user.getTipo() == null) {
             user.setTipo(TipoUsuario.EXTERNO);
         }
@@ -49,9 +49,8 @@ public class UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             
-            // Verifica se é usuário BACKOFFICE (apenas backoffice pode acessar o sistema)
-            // Verifica se está ativo
-            // Verifica se a senha confere
+            // Verifica se é usuário BACKOFFICE 
+            // Verifica a senha
             if (user.getTipo() == TipoUsuario.BACKOFFICE &&
                 user.getStatus() == Status.ATIVO &&
                 passwordEncoder.matches(senha, user.getSenha())) {
@@ -96,7 +95,7 @@ public class UserService {
             
             // Só altera senha se foi fornecida nova senha
             if (usuarioAlterado.getSenha() != null && !usuarioAlterado.getSenha().trim().isEmpty()) {
-                // Valida se as duas senhas são iguais (deve ser validado no frontend)
+                // Valida se as duas senhas são iguais 
                 user.setSenha(passwordEncoder.encode(usuarioAlterado.getSenha()));
             }
             

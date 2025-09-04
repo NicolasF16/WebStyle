@@ -18,13 +18,13 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String senha; // Senha criptografada
+    private String senha; 
 
     @Enumerated(EnumType.STRING)
     private Status status; // ATIVO ou INATIVO
 
     @Enumerated(EnumType.STRING)
-    private TipoUsuario tipo; // BACKOFFICE (admin/estoquista) ou EXTERNO
+    private TipoUsuario tipo; // BACKOFFICE 
 
     public enum Status {
         ATIVO, INATIVO
@@ -34,17 +34,17 @@ public class User {
         BACKOFFICE, EXTERNO
     }
 
-    // Construtor padrão
+    
     public User() {}
 
-    // Construtor com parâmetros
+   
     public User(String nome, String cpf, String email, String senha, TipoUsuario tipo) {
         this.nome = nome;
         this.cpf = cpf;
         this.email = email;
         this.senha = senha;
         this.tipo = tipo;
-        this.status = Status.ATIVO; // Por padrão ativo
+        this.status = Status.ATIVO; 
     }
 
     // Getters e Setters
