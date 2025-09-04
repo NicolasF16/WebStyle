@@ -30,7 +30,7 @@
                 <td th:text="${usuario.cpf}"></td>
                 <td th:text="${usuario.email}"></td>
                 <td th:text="${usuario.status}"></td>
-                <td th:text="${usuario.tipo == 'BACKOFFICE' ? 'Administrador' : 'Externo'}"></td>
+                <td th:text="${usuario.tipo == 'BACKOFFICE' ? 'Administrador' : 'Backoffice'}"></td>
                 <td>
                     <!-- Formulário para alterar status -->
                     <form th:action="@{'/usuarios/status/' + ${usuario.id}}" method="post" style="display:inline;">
