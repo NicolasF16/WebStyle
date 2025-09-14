@@ -16,18 +16,31 @@
             <input type="password" id="senha" name="senha" required>
             
             <button type="submit">OK</button>
-            <button type="button" onclick="window.location.href='/usuarios/novo'">Cancelar</button>
+            <button type="reset">Limpar</button>
         </form>
-        
-        <!-- Link para cadastro de usuário -->
-        <div class="cadastro-link">
-            <p><a th:href="@{/usuarios/novo}">Não tem conta? Cadastre-se aqui</a></p>
-        </div>
         
         <!-- Mensagem de erro -->
         <div th:if="${erro}" class="error-message">
             <p th:text="${erro}"></p>
         </div>
+    
     </div>
+
+    <style>
+        .admin-info {
+            background: #f2f8ff;
+            border: 1px solid #0074d9;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .admin-info p {
+            margin: 4px 0;
+            color: #333;
+        }
+    </style>
 </body>
 </html>

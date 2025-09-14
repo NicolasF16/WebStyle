@@ -18,6 +18,13 @@
             <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
             
+            <label for="tipo">Grupo:</label>
+            <select id="tipo" name="tipo" required>
+                <option value="">Selecione</option>
+                <option value="BACKOFFICE">Administrador</option>
+                <option value="EXTERNO">Estoquista</option>
+            </select>
+            
             <label for="senha">Senha:</label>
             <input type="password" id="senha" name="senha" required>
             
@@ -29,13 +36,8 @@
             </div>
             
             <button type="submit">Cadastrar</button>
-            <button type="button" onclick="window.location.href='/login'">Cancelar</button>
+            <button type="button" onclick="window.location.href='/usuarios'">Cancelar</button>
         </form>
-        
-        <!-- Link para cadastro de admin -->
-        <div class="admin-link">
-            <a th:href="@{/admin-form}" class="admin-btn">Cadastrar Admin</a>
-        </div>
         
         <!-- Mensagem de erro -->
         <div th:if="${erro}" class="error-message">

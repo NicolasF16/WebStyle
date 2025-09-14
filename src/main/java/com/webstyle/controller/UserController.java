@@ -30,19 +30,40 @@ public class UserController {
         return "user-list";
     }
 
-    // Formulário para cadastrar novo usuário
+    // Formulário para cadastrar novo usuário (apenas para admins logados)
     @GetMapping("/usuarios/novo")
-    public String novoUsuarioForm(Model model) {
+    public String novoUsuarioForm(Model model, HttpSession session) {
+        // Verifica se usuário está logado e é administrador
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            return "redirect:/login";
+        }
+        
         model.addAttribute("usuario", new User());
         return "user-form";
     }
 
-    // Cadastra novo usuário
+    // Cadastra novo usuário (apenas para admins logados)
     @PostMapping("/cadastro")
-    public String cadastrarUsuario(@ModelAttribute User usuario, Model model) {
-        try {
-            userService.cadastrarUsuario(usuario);
+    public String cadastrarUsuario(@ModelAttribute User usuario, 
+                                  @RequestParam String senha2,
+                                  Model model, 
+                                  HttpSession session) {
+        // Verifica se usuário está logado e é administrador
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
             return "redirect:/login";
+        }
+        
+        try {
+            // Valida se as senhas coincidem
+            if (!usuario.getSenha().equals(senha2)) {
+                model.addAttribute("erro", "As senhas não coincidem.");
+                return "user-form";
+            }
+            
+            userService.cadastrarUsuario(usuario);
+            return "redirect:/usuarios";
         } catch (Exception e) {
             model.addAttribute("erro", "Erro ao cadastrar usuário: " + e.getMessage());
             return "user-form";
