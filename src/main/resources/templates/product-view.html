@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Visualizar Produto</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+    <div class="view-container">
+        <h2>Detalhes do Produto</h2>
+        
+        <div class="product-details">
+            <div class="detail-group">
+                <label>Código:</label>
+                <span th:text="${produto.codigo}"></span>
+            </div>
+            
+            <div class="detail-group">
+                <label>Nome:</label>
+                <span th:text="${produto.nome}"></span>
+            </div>
+            
+            <div class="detail-group">
+                <label>Descrição:</label>
+                <span th:text="${produto.descricao ?: 'Sem descrição'}"></span>
+            </div>
+            
+            <div class="detail-group">
+                <label>Preço:</label>
+                <span>R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}"></span></span>
+            </div>
+            
+            <div class="detail-group">
+                <label>Quantidade em Estoque:</label>
+                <span th:text="${produto.quantidadeEstoque}"></span>
+            </div>
+            
+            <div class="detail-group">
+                <label>Status:</label>
+                <span th:class="${produto.status == 'ATIVO' ? 'status-ativo' : 'status-inativo'}" 
+                      th:text="${produto.status}"></span>
+            </div>
+            
+            <div class="detail-group">
+                <label>Data de Criação:</label>
+                <span th:text="${#temporals.format(produto.dataCriacao, 'dd/MM/yyyy HH:mm')}"></span>
+            </div>
+            
+            <div class="detail-group" th:if="${produto.dataAtualizacao}">
+                <label>Última Atualização:</label>
+                <span th:text="${#temporals.format(produto.dataAtualizacao, 'dd/MM/yyyy HH:mm')}"></span>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <a th:href="@{'/produtos/editar/' + ${produto.id}}" class="edit-btn">Editar Produto</a>
+            <a th:href="@{/produtos}" class="back-btn">Voltar à Lista</a>
+        </div>
+    </div>
+
+    <style>
+        .view-container {
+            background: #fff;
+            border: 2px solid #0074d9;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 32px 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .product-details {
+            margin: 20px 0;
+        }
+        
+        .detail-group {
+            display: flex;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #0074d9;
+        }
+        
+        .detail-group label {
+            font-weight: bold;
+            color: #0074d9;
+            min-width: 160px;
+            margin-bottom: 0;
+            margin-right: 16px;
+        }
+        
+        .detail-group span {
+            color: #333;
+            flex: 1;
+            word-wrap: break-word;
+        }
+        
+        .status-ativo {
+            background: #28a745;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-inativo {
+            background: #dc3545;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .edit-btn, .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: #fff;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        
+        @media (max-width: 768px) {
+            .view-container {
+                margin: 20px;
+                max-width: none;
+            }
+            
+            .detail-group {
+                flex-direction: column;
+            }
+            
+            .detail-group label {
+                min-width: auto;
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</body>
+</html>

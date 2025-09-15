@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lista de Produtos</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+    <h2>Lista de Produtos</h2>
+    
+    <div class="actions">
+        <a th:href="@{/produtos/novo}" class="add-btn">+ Cadastrar Novo Produto</a>
+        <a th:href="@{/main}">← Voltar ao Menu Principal</a>
+    </div>
+    
+    <!-- Campo de busca -->
+    <div class="search-container">
+        <form th:action="@{/produtos}" method="get" class="search-form">
+            <input type="text" name="busca" th:value="${busca}" placeholder="Buscar por nome ou código..." class="search-input">
+            <button type="submit" class="search-btn">Buscar</button>
+            <a th:href="@{/produtos}" class="clear-btn">Limpar</a>
+        </form>
+    </div>
+    
+    <!-- Informações da listagem -->
+    <div class="info-container" th:if="${totalElementos > 0}">
+        <p>Exibindo produtos <span th:text="${paginaAtual * 10 + 1}"></span> a 
+           <span th:text="${(paginaAtual + 1) * 10 > totalElementos ? totalElementos : (paginaAtual + 1) * 10}"></span> 
+           de <span th:text="${totalElementos}"></span> produtos encontrados</p>
+        <p th:if="${busca}" class="search-info">Resultados para: "<span th:text="${busca}"></span>"</p>
+    </div>
+    
+    <table th:if="${totalElementos > 0}">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Quantidade</th>
+                <th>Valor (R$)</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="produto : ${produtos.content}">
+                <td th:text="${produto.codigo}"></td>
+                <td th:text="${produto.nome}"></td>
+                <td th:text="${produto.quantidadeEstoque}"></td>
+                <td th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}"></td>
+                <td>
+                    <span th:class="${produto.status == 'ATIVO' ? 'status-ativo' : 'status-inativo'}" 
+                          th:text="${produto.status}"></span>
+                </td>
+                <td class="actions-cell">
+                    <!-- Visualizar -->
+                    <a th:href="@{'/produtos/visualizar/' + ${produto.id}}" class="action-btn view-btn" title="Visualizar">
+                        👁️
+                    </a>
+                    
+                    <!-- Editar -->
+                    <a th:href="@{'/produtos/editar/' + ${produto.id}}" class="action-btn edit-btn" title="Editar">
+                        ✏️
+                    </a>
+                    
+                    <!-- Alterar Status -->
+                    <form th:action="@{'/produtos/status/' + ${produto.id}}" method="post" style="display:inline;">
+                        <input type="hidden" name="status" th:value="${produto.status == 'ATIVO' ? 'INATIVO' : 'ATIVO'}">
+                        <button type="submit" 
+                                th:class="${produto.status == 'ATIVO' ? 'action-btn deactivate-btn' : 'action-btn activate-btn'}"
+                                th:title="${produto.status == 'ATIVO' ? 'Inativar' : 'Reativar'}"
+                                onclick="return confirm('Confirma a alteração de status?')">
+                            <span th:if="${produto.status == 'ATIVO'}">🚫</span>
+                            <span th:if="${produto.status == 'INATIVO'}">✅</span>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Paginação -->
+    <div class="pagination" th:if="${totalPaginas > 1}">
+        <!-- Primeira página -->
+        <a th:if="${paginaAtual > 0}" 
+           th:href="@{/produtos(pagina=0, busca=${busca})}" 
+           class="page-btn">« Primeira</a>
+        
+        <!-- Página anterior -->
+        <a th:if="${paginaAtual > 0}" 
+           th:href="@{/produtos(pagina=${paginaAtual - 1}, busca=${busca})}" 
+           class="page-btn">‹ Anterior</a>
+        
+        <!-- Páginas numeradas -->
+        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}" 
+              th:if="${i >= paginaAtual - 2 && i <= paginaAtual + 2}">
+            <a th:if="${i != paginaAtual}" 
+               th:href="@{/produtos(pagina=${i}, busca=${busca})}" 
+               class="page-btn" th:text="${i + 1}"></a>
+            <span th:if="${i == paginaAtual}" 
+                  class="page-btn current" th:text="${i + 1}"></span>
+        </span>
+        
+        <!-- Próxima página -->
+        <a th:if="${paginaAtual < totalPaginas - 1}" 
+           th:href="@{/produtos(pagina=${paginaAtual + 1}, busca=${busca})}" 
+           class="page-btn">Próxima ›</a>
+        
+        <!-- Última página -->
+        <a th:if="${paginaAtual < totalPaginas - 1}" 
+           th:href="@{/produtos(pagina=${totalPaginas - 1}, busca=${busca})}" 
+           class="page-btn">Última »</a>
+    </div>
+    
+    <!-- Caso não haja produtos -->
+    <div th:if="${totalElementos == 0}" class="no-products">
+        <p th:if="${busca}">Nenhum produto encontrado para a busca: "<span th:text="${busca}"></span>"</p>
+        <p th:unless="${busca}">Nenhum produto cadastrado no sistema.</p>
+    </div>
+
+    <style>
+        .search-container {
+            background: #fff;
+            border: 1px solid #0074d9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 8px 12px;
+            border: 1px solid #0074d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-btn, .clear-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        
+        .search-btn {
+            background: #0074d9;
+            color: #fff;
+        }
+        
+        .search-btn:hover {
+            background: #005fa3;
+        }
+        
+        .clear-btn {
+            background: #f8f9fa;
+            color: #0074d9;
+            border: 1px solid #0074d9;
+        }
+        
+        .clear-btn:hover {
+            background: #e9ecef;
+        }
+        
+        .info-container {
+            text-align: center;
+            margin: 20px 0;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .search-info {
+            font-weight: bold;
+            color: #0074d9;
+        }
+        
+        .add-btn {
+            background: #28a745 !important;
+            color: #fff;
+            font-weight: bold;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0 8px;
+        }
+        
+        .add-btn:hover {
+            background: #218838 !important;
+        }
+        
+        .status-ativo {
+            background: #28a745;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-inativo {
+            background: #dc3545;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .actions-cell {
+            white-space: nowrap;
+        }
+        
+        .action-btn {
+            display: inline-block;
+            padding: 6px 8px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .view-btn {
+            background: #17a2b8;
+            color: #fff;
+        }
+        
+        .view-btn:hover {
+            background: #138496;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
+        .activate-btn {
+            background: #28a745;
+            color: #fff;
+        }
+        
+        .activate-btn:hover {
+            background: #218838;
+        }
+        
+        .deactivate-btn {
+            background: #dc3545;
+            color: #fff;
+        }
+        
+        .deactivate-btn:hover {
+            background: #c82333;
+        }
+        
+        .pagination {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+        }
+        
+        .page-btn {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 0 4px;
+            background: #fff;
+            border: 1px solid #0074d9;
+            color: #0074d9;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .page-btn:hover {
+            background: #0074d9;
+            color: #fff;
+        }
+        
+        .page-btn.current {
+            background: #0074d9;
+            color: #fff;
+            cursor: default;
+        }
+        
+        .no-products {
+            text-align: center;
+            margin: 40px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .no-products p {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .actions-cell .action-btn {
+                display: block;
+                margin: 2px 0;
+            }
+            
+            .pagination .page-btn {
+                padding: 6px 8px;
+                margin: 0 2px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</body>
+</html>
