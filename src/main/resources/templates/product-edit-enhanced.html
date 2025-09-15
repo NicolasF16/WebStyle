@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Produto</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <style>
+        .form-container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #0074d9;
+            border-radius: 4px;
+            margin-bottom: 18px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .rating-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rating-select {
+            padding: 8px;
+            border: 1px solid #0074d9;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .existing-images {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .section-title {
+            color: #0074d9;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .image-card {
+            position: relative;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .image-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .image-card.principal {
+            border-color: #28a745;
+            border-width: 3px;
+        }
+
+        .image-card.to-remove {
+            opacity: 0.5;
+            border-color: #dc3545;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .image-actions {
+            padding: 8px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .image-name {
+            font-size: 10px;
+            color: #666;
+            max-width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-principal {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-principal:hover {
+            background: #218838;
+        }
+
+        .btn-principal.active {
+            background: #155724;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .btn-undo {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-undo:hover {
+            background: #545b62;
+        }
+
+        .principal-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #28a745;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .remove-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(220, 53, 69, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .new-images-section {
+            background: #e8f4fd;
+            border: 2px dashed #0074d9;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-btn {
+            background: #0074d9;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .file-input-btn:hover {
+            background: #005fa3;
+        }
+
+        .new-images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .new-image-item {
+            position: relative;
+            border: 2px solid #0074d9;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 120px;
+        }
+
+        .new-image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .new-remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-primary {
+            background: #0074d9;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #005fa3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border: 1px solid #f1aeb5;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 12px;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .new-images-preview {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Editar Produto</h2>
+        
+        <!-- Mensagens de erro -->
+        <div th:if="${erro}" class="error-message" th:text="${erro}"></div>
+        
+        <form th:action="@{'/produtos/alterar/' + ${produto.id}}" method="post" enctype="multipart/form-data" id="editForm">
+            
+            <!-- Dados básicos do produto -->
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="codigo">Código do Produto*:</label>
+                        <input type="text" id="codigo" name="codigo" th:value="${produto.codigo}" required maxlength="50">
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="status">Status*:</label>
+                        <select id="status" name="status" required>
+                            <option value="">Selecione</option>
+                            <option value="ATIVO" th:selected="${produto.status == 'ATIVO'}">Ativo</option>
+                            <option value="INATIVO" th:selected="${produto.status == 'INATIVO'}">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="nome">Nome do Produto* (máx. 200 caracteres):</label>
+                <input type="text" id="nome" name="nome" th:value="${produto.nome}" required maxlength="200">
+                <small>Caracteres restantes: <span id="nomeCount">200</span></small>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição Detalhada (máx. 2000 caracteres):</label>
+                <textarea id="descricao" name="descricao" rows="4" maxlength="2000" th:text="${produto.descricao}"></textarea>
+                <small>Caracteres restantes: <span id="descricaoCount">2000</span></small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="preco">Preço (R$)*:</label>
+                        <input type="number" id="preco" name="preco" step="0.01" min="0.01" th:value="${produto.preco}" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="quantidadeEstoque">Quantidade em Estoque*:</label>
+                        <input type="number" id="quantidadeEstoque" name="quantidadeEstoque" min="0" th:value="${produto.quantidadeEstoque}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="avaliacao">Avaliação (1.0 a 5.0)*:</label>
+                <div class="rating-group">
+                    <select id="avaliacao" name="avaliacao" class="rating-select" required>
+                        <option value="">Selecione</option>
+                        <option value="1.0" th:selected="${produto.avaliacao?.toString() == '1.0'}">⭐ 1.0</option>
+                        <option value="1.5" th:selected="${produto.avaliacao?.toString() == '1.5'}">⭐ 1.5</option>
+                        <option value="2.0" th:selected="${produto.avaliacao?.toString() == '2.0'}">⭐⭐ 2.0</option>
+                        <option value="2.5" th:selected="${produto.avaliacao?.toString() == '2.5'}">⭐⭐ 2.5</option>
+                        <option value="3.0" th:selected="${produto.avaliacao?.toString() == '3.0'}">⭐⭐⭐ 3.0</option>
+                        <option value="3.5" th:selected="${produto.avaliacao?.toString() == '3.5'}">⭐⭐⭐ 3.5</option>
+                        <option value="4.0" th:selected="${produto.avaliacao?.toString() == '4.0'}">⭐⭐⭐⭐ 4.0</option>
+                        <option value="4.5" th:selected="${produto.avaliacao?.toString() == '4.5'}">⭐⭐⭐⭐ 4.5</option>
+                        <option value="5.0" th:selected="${produto.avaliacao?.toString() == '5.0'}">⭐⭐⭐⭐⭐ 5.0</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Imagens existentes -->
+            <div class="existing-images" th:if="${imagens != null && !imagens.isEmpty()}">
+                <h3 class="section-title">🖼️ Imagens Atuais do Produto</h3>
+                <div class="info-box">
+                    💡 <strong>Dica:</strong> Clique em "Principal" para definir a imagem que aparecerá na página inicial. 
+                    Clique em "Remover" para marcar imagens para exclusão.
+                </div>
+                
+                <div class="images-grid">
+                    <div class="image-card" th:each="imagem : ${imagens}" th:data-image-id="${imagem.id}" th:classappend="${imagem.imagemPrincipal} ? 'principal' : ''">
+                        <img th:src="'/' + ${imagem.caminhoArquivo}" alt="Imagem do produto" class="image-preview">
+                        <div class="principal-badge" th:if="${imagem.imagemPrincipal}">★ PRINCIPAL</div>
+                        <div class="remove-overlay" style="display: none;">SERÁ REMOVIDA</div>
+                        <div class="image-actions">
+                            <span class="image-name" th:text="${imagem.nomeOriginal}" th:title="${imagem.nomeOriginal}"></span>
+                            <div>
+                                <button type="button" class="btn-small btn-principal" th:classappend="${imagem.imagemPrincipal} ? 'active' : ''" 
+                                        th:onclick="'setPrincipalExisting(' + ${imagem.id} + ')'" th:unless="${imagem.imagemPrincipal}">
+                                    Principal
+                                </button>
+                                <button type="button" class="btn-small btn-remove" th:onclick="'toggleRemove(' + ${imagem.id} + ')'">
+                                    Remover
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Novas imagens -->
+            <div class="new-images-section">
+                <h3 class="section-title">📁 Adicionar Novas Imagens</h3>
+                <p>Selecione novas imagens para adicionar ao produto</p>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="novasImagensInput" name="novasImagens" multiple accept="image/*" onchange="previewNewImages()">
+                    <label for="novasImagensInput" class="file-input-btn">
+                        📁 Escolher Novas Imagens
+                    </label>
+                </div>
+                
+                <div id="newImagesPreview" class="new-images-preview"></div>
+            </div>
+
+            <!-- Campos hidden para controlar remoções -->
+            <input type="hidden" id="imagensParaRemover" name="imagensParaRemover" value="">
+            
+            <!-- Botões de ação -->
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
+                <a th:href="@{/produtos}" class="btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let imagensToRemove = [];
+        let newSelectedImages = [];
+        let currentPrincipalId = null;
+
+        // Inicializar imagem principal atual
+        document.addEventListener('DOMContentLoaded', function() {
+            const principalCard = document.querySelector('.image-card.principal');
+            if (principalCard) {
+                currentPrincipalId = parseInt(principalCard.dataset.imageId);
+            }
+            
+            // Inicializar contadores de caracteres
+            updateCharCount();
+        });
+
+        // Contadores de caracteres
+        function updateCharCount() {
+            const nome = document.getElementById('nome');
+            const descricao = document.getElementById('descricao');
+            
+            nome.addEventListener('input', function() {
+                const remaining = 200 - this.value.length;
+                const counter = document.getElementById('nomeCount');
+                counter.textContent = remaining;
+                counter.style.color = remaining < 20 ? '#dc3545' : '#666';
+            });
+
+            descricao.addEventListener('input', function() {
+                const remaining = 2000 - this.value.length;
+                const counter = document.getElementById('descricaoCount');
+                counter.textContent = remaining;
+                counter.style.color = remaining < 100 ? '#dc3545' : '#666';
+            });
+
+            // Executar uma vez para valores iniciais
+            if (nome.value) {
+                const remaining = 200 - nome.value.length;
+                document.getElementById('nomeCount').textContent = remaining;
+            }
+            
+            if (descricao.value) {
+                const remaining = 2000 - descricao.value.length;
+                document.getElementById('descricaoCount').textContent = remaining;
+            }
+        }
+
+        // Marcar/desmarcar imagem para remoção
+        function toggleRemove(imageId) {
+            const card = document.querySelector(`[data-image-id="${imageId}"]`);
+            const overlay = card.querySelector('.remove-overlay');
+            const button = card.querySelector('.btn-remove');
+            
+            if (imagensToRemove.includes(imageId)) {
+                // Remover da lista de remoção
+                imagensToRemove = imagensToRemove.filter(id => id !== imageId);
+                card.classList.remove('to-remove');
+                overlay.style.display = 'none';
+                button.textContent = 'Remover';
+                button.classList.remove('btn-undo');
+                button.classList.add('btn-remove');
+            } else {
+                // Verificar se é a imagem principal
+                if (imageId === currentPrincipalId) {
+                    if (!confirm('Esta é a imagem principal. Tem certeza que deseja removê-la?')) {
+                        return;
+                    }
+                }
+                
+                // Adicionar à lista de remoção
+                imagensToRemove.push(imageId);
+                card.classList.add('to-remove');
+                overlay.style.display = 'flex';
+                button.textContent = 'Desfazer';
+                button.classList.remove('btn-remove');
+                button.classList.add('btn-undo');
+            }
+            
+            // Atualizar campo hidden
+            document.getElementById('imagensParaRemover').value = imagensToRemove.join(',');
+        }
+
+        // Definir imagem principal (existente)
+        function setPrincipalExisting(imageId) {
+            // Remove principal atual
+            document.querySelectorAll('.image-card').forEach(card => {
+                card.classList.remove('principal');
+                const badge = card.querySelector('.principal-badge');
+                if (badge) badge.remove();
+                
+                const btn = card.querySelector('.btn-principal');
+                if (btn) {
+                    btn.classList.remove('active');
+                    btn.textContent = 'Principal';
+                }
+            });
+            
+            // Define novo principal
+            const newPrincipalCard = document.querySelector(`[data-image-id="${imageId}"]`);
+            newPrincipalCard.classList.add('principal');
+            
+            const badge = document.createElement('div');
+            badge.className = 'principal-badge';
+            badge.textContent = '★ PRINCIPAL';
+            newPrincipalCard.appendChild(badge);
+            
+            const btn = newPrincipalCard.querySelector('.btn-principal');
+            btn.classList.add('active');
+            btn.textContent = '★ Principal';
+            
+            currentPrincipalId = imageId;
+        }
+
+        // Preview de novas imagens
+        function previewNewImages() {
+            const input = document.getElementById('novasImagensInput');
+            const preview = document.getElementById('newImagesPreview');
+            
+            newSelectedImages = Array.from(input.files);
+            preview.innerHTML = '';
+            
+            if (newSelectedImages.length === 0) {
+                return;
+            }
+            
+            newSelectedImages.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'new-image-item';
+                    imageDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="Nova imagem ${index + 1}">
+                        <button type="button" class="new-remove-btn" onclick="removeNewImage(${index})" title="Remover">×</button>
+                    `;
+                    preview.appendChild(imageDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Remover nova imagem
+        function removeNewImage(index) {
+            newSelectedImages.splice(index, 1);
+            updateNewImagesInput();
+            previewNewImagesFromArray();
+        }
+
+        // Atualizar input de novas imagens
+        function updateNewImagesInput() {
+            const input = document.getElementById('novasImagensInput');
+            const dt = new DataTransfer();
+            
+            newSelectedImages.forEach(file => {
+                dt.items.add(file);
+            });
+            
+            input.files = dt.files;
+        }
+
+        // Re-renderizar preview de novas imagens
+        function previewNewImagesFromArray() {
+            const preview = document.getElementById('newImagesPreview');
+            preview.innerHTML = '';
+            
+            newSelectedImages.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'new-image-item';
+                    imageDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="Nova imagem ${index + 1}">
+                        <button type="button" class="new-remove-btn" onclick="removeNewImage(${index})" title="Remover">×</button>
+                    `;
+                    preview.appendChild(imageDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Validação do formulário
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            const nome = document.getElementById('nome').value.trim();
+            const preco = parseFloat(document.getElementById('preco').value);
+            const quantidade = parseInt(document.getElementById('quantidadeEstoque').value);
+            const avaliacao = parseFloat(document.getElementById('avaliacao').value);
+            
+            if (!nome || nome.length > 200) {
+                alert('Nome do produto é obrigatório e deve ter no máximo 200 caracteres.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!preco || preco <= 0) {
+                alert('Preço deve ser maior que zero.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (isNaN(quantidade) || quantidade < 0) {
+                alert('Quantidade em estoque não pode ser negativa.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!avaliacao || avaliacao < 1.0 || avaliacao > 5.0) {
+                alert('Avaliação deve estar entre 1.0 e 5.0.');
+                e.preventDefault();
+                return;
+            }
+            
+            const descricao = document.getElementById('descricao').value;
+            if (descricao && descricao.length > 2000) {
+                alert('Descrição deve ter no máximo 2000 caracteres.');
+                e.preventDefault();
+                return;
+            }
+            
+            // Verificar se ainda haverá pelo menos uma imagem após as remoções
+            const totalImagensAtuais = document.querySelectorAll('.image-card').length;
+            const imagensRemovidas = imagensToRemove.length;
+            const novasImagens = newSelectedImages.length;
+            const imagensRestantes = totalImagensAtuais - imagensRemovidas + novasImagens;
+            
+            if (imagensRestantes === 0) {
+                if (!confirm('O produto ficará sem imagens. Deseja continuar?')) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Backoffice</name>
-    <description>Projeto Backoffice Spring Boot</description>
+    <description>Projeto Backoffice Spring Boot - Sistema de Loja de Roupas</description>
     
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -79,6 +79,20 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.0.0</version>
             <scope>provided</scope>
+        </dependency>
+        
+        <!-- Apache Commons FileUpload para upload de arquivos -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.5</version>
+        </dependency>
+        
+        <!-- Apache Commons IO para manipulação de arquivos -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
         </dependency>
     </dependencies>
     

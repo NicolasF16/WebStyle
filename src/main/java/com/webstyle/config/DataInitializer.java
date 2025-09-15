@@ -38,117 +38,134 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Administrador padrão criado: admin@gmail.com / Admin123");
         }
         
-        // Cria alguns produtos de exemplo se não existirem
+        // Cria produtos de roupas de exemplo se não existirem
         if (productRepository.count() == 0) {
+            // Roupas Femininas
             Product produto1 = new Product();
-            produto1.setCodigo("SMART001");
-            produto1.setNome("Smartphone Galaxy A54");
-            produto1.setDescricao("Smartphone Samsung Galaxy A54 128GB 6GB RAM Câmera Tripla");
-            produto1.setPreco(new BigDecimal("1299.99"));
+            produto1.setCodigo("VEST001");
+            produto1.setNome("Vestido Floral Midi");
+            produto1.setDescricao("Vestido midi com estampa floral delicada, ideal para ocasiões especiais. Tecido fluido e confortável, com modelagem que valoriza a silhueta feminina. Possui forro interno e fechamento lateral com zíper invisível.");
+            produto1.setPreco(new BigDecimal("159.90"));
             produto1.setQuantidadeEstoque(25);
+            produto1.setAvaliacao(new BigDecimal("4.5"));
             produto1.setStatus(Product.Status.ATIVO);
             productRepository.save(produto1);
 
             Product produto2 = new Product();
-            produto2.setCodigo("NOTE001");
-            produto2.setNome("Notebook Dell Inspiron 15");
-            produto2.setDescricao("Notebook Dell Inspiron 15 3000 Intel Core i5 8GB 256GB SSD");
-            produto2.setPreco(new BigDecimal("2899.90"));
-            produto2.setQuantidadeEstoque(10);
+            produto2.setCodigo("BLUSA001");
+            produto2.setNome("Blusa Manga Longa Básica");
+            produto2.setDescricao("Blusa básica de manga longa em algodão 100%. Corte reto e confortável, perfeita para o dia a dia. Disponível em várias cores. Ideal para compor looks casuais ou profissionais.");
+            produto2.setPreco(new BigDecimal("79.90"));
+            produto2.setQuantidadeEstoque(50);
+            produto2.setAvaliacao(new BigDecimal("4.0"));
             produto2.setStatus(Product.Status.ATIVO);
             productRepository.save(produto2);
 
             Product produto3 = new Product();
-            produto3.setCodigo("MOUSE001");
-            produto3.setNome("Mouse Gamer Logitech");
-            produto3.setDescricao("Mouse Gamer Logitech G203 RGB 6 Botões 8000 DPI");
-            produto3.setPreco(new BigDecimal("129.99"));
-            produto3.setQuantidadeEstoque(50);
+            produto3.setCodigo("CALCA001");
+            produto3.setNome("Calça Jeans Skinny Feminina");
+            produto3.setDescricao("Calça jeans skinny de cintura alta, confeccionada em denim de alta qualidade. Modelagem que valoriza as curvas e proporciona conforto durante todo o dia. Possui elastano na composição para maior flexibilidade.");
+            produto3.setPreco(new BigDecimal("129.90"));
+            produto3.setQuantidadeEstoque(35);
+            produto3.setAvaliacao(new BigDecimal("4.5"));
             produto3.setStatus(Product.Status.ATIVO);
             productRepository.save(produto3);
 
+            // Roupas Masculinas
             Product produto4 = new Product();
-            produto4.setCodigo("TABLET001");
-            produto4.setNome("Tablet Samsung Galaxy Tab A8");
-            produto4.setDescricao("Tablet Samsung Galaxy Tab A8 64GB 4GB RAM Tela 10.5");
-            produto4.setPreco(new BigDecimal("899.99"));
-            produto4.setQuantidadeEstoque(0);
-            produto4.setStatus(Product.Status.INATIVO);
+            produto4.setCodigo("CAMI001");
+            produto4.setNome("Camisa Social Masculina");
+            produto4.setDescricao("Camisa social masculina em algodão premium, corte slim fit. Ideal para ambientes corporativos e eventos sociais. Possui colarinho italiano e punhos com abotoadura dupla. Fácil de passar e manter.");
+            produto4.setPreco(new BigDecimal("189.90"));
+            produto4.setQuantidadeEstoque(20);
+            produto4.setAvaliacao(new BigDecimal("4.0"));
+            produto4.setStatus(Product.Status.ATIVO);
             productRepository.save(produto4);
 
             Product produto5 = new Product();
-            produto5.setCodigo("SMART002");
-            produto5.setNome("Smartwatch Apple Watch SE");
-            produto5.setDescricao("Apple Watch SE GPS 44mm Caixa de Alumínio Prata");
-            produto5.setPreco(new BigDecimal("1899.00"));
-            produto5.setQuantidadeEstoque(15);
+            produto5.setCodigo("POLO001");
+            produto5.setNome("Polo Masculina Premium");
+            produto5.setDescricao("Camisa polo masculina em piquet de algodão egípcio. Modelagem confortável com gola e punhos em ribana. Possui bordado discreto no peito. Ideal para ocasiões casuais e esporte fino.");
+            produto5.setPreco(new BigDecimal("119.90"));
+            produto5.setQuantidadeEstoque(40);
+            produto5.setAvaliacao(new BigDecimal("4.5"));
             produto5.setStatus(Product.Status.ATIVO);
             productRepository.save(produto5);
 
             Product produto6 = new Product();
-            produto6.setCodigo("HEAD001");
-            produto6.setNome("Headset Gamer HyperX");
-            produto6.setDescricao("Headset Gamer HyperX Cloud Stinger Core 7.1 Surround");
-            produto6.setPreco(new BigDecimal("299.99"));
+            produto6.setCodigo("BERMUDA001");
+            produto6.setNome("Bermuda Jeans Masculina");
+            produto6.setDescricao("Bermuda jeans masculina com lavação moderna. Modelagem regular fit com cinco bolsos tradicionais. Confeccionada em denim resistente com acabamento de qualidade. Perfeita para o verão.");
+            produto6.setPreco(new BigDecimal("89.90"));
             produto6.setQuantidadeEstoque(30);
+            produto6.setAvaliacao(new BigDecimal("3.5"));
             produto6.setStatus(Product.Status.ATIVO);
             productRepository.save(produto6);
 
+            // Acessórios e Calçados
             Product produto7 = new Product();
-            produto7.setCodigo("CAM001");
-            produto7.setNome("Câmera Canon EOS Rebel T7");
-            produto7.setDescricao("Câmera Canon EOS Rebel T7 24.1MP Kit com Lente 18-55mm");
-            produto7.setPreco(new BigDecimal("2299.99"));
-            produto7.setQuantidadeEstoque(5);
+            produto7.setCodigo("TENIS001");
+            produto7.setNome("Tênis Casual Unissex");
+            produto7.setDescricao("Tênis casual unissex em couro sintético com solado de borracha. Design moderno e versátil, combina com diversos estilos. Palmilha anatômica para maior conforto. Disponível em várias cores.");
+            produto7.setPreco(new BigDecimal("199.90"));
+            produto7.setQuantidadeEstoque(15);
+            produto7.setAvaliacao(new BigDecimal("4.0"));
             produto7.setStatus(Product.Status.ATIVO);
             productRepository.save(produto7);
 
             Product produto8 = new Product();
-            produto8.setCodigo("SMART003");
-            produto8.setNome("Smart TV LG 55");
-            produto8.setDescricao("Smart TV LG 55 4K UHD ThinQ AI HDR Ativo DTS Virtual");
-            produto8.setPreco(new BigDecimal("2199.90"));
-            produto8.setQuantidadeEstoque(8);
+            produto8.setCodigo("BOLSA001");
+            produto8.setNome("Bolsa Feminina Transversal");
+            produto8.setDescricao("Bolsa feminina transversal em couro sintético de alta qualidade. Design minimalista e elegante, possui compartimentos internos organizadores. Alça ajustável e removível. Ideal para o dia a dia.");
+            produto8.setPreco(new BigDecimal("149.90"));
+            produto8.setQuantidadeEstoque(25);
+            produto8.setAvaliacao(new BigDecimal("4.5"));
             produto8.setStatus(Product.Status.ATIVO);
             productRepository.save(produto8);
 
             Product produto9 = new Product();
-            produto9.setCodigo("GAME001");
-            produto9.setNome("Console PlayStation 5");
-            produto9.setDescricao("Console Sony PlayStation 5 825GB SSD 4K HDR");
-            produto9.setPreco(new BigDecimal("4299.99"));
-            produto9.setQuantidadeEstoque(3);
+            produto9.setCodigo("CINTO001");
+            produto9.setNome("Cinto de Couro Masculino");
+            produto9.setDescricao("Cinto masculino em couro legítimo com fivela em metal escovado. Largura de 3,5cm, ideal para uso social e casual. Acabamento impecável e durabilidade garantida. Disponível em preto e marrom.");
+            produto9.setPreco(new BigDecimal("79.90"));
+            produto9.setQuantidadeEstoque(45);
+            produto9.setAvaliacao(new BigDecimal("4.0"));
             produto9.setStatus(Product.Status.ATIVO);
             productRepository.save(produto9);
 
+            // Roupas Infantis
             Product produto10 = new Product();
-            produto10.setCodigo("AIR001");
-            produto10.setNome("AirPods Pro Apple");
-            produto10.setDescricao("Apple AirPods Pro 2ª Geração com Cancelamento Ativo de Ruído");
-            produto10.setPreco(new BigDecimal("1699.00"));
-            produto10.setQuantidadeEstoque(20);
+            produto10.setCodigo("CONJ001");
+            produto10.setNome("Conjunto Infantil Menino");
+            produto10.setDescricao("Conjunto infantil composto por camiseta e bermuda em malha de algodão. Estampa divertida e cores vibrantes. Confortável e prático para brincadeiras. Tamanhos de 2 a 10 anos.");
+            produto10.setPreco(new BigDecimal("69.90"));
+            produto10.setQuantidadeEstoque(35);
+            produto10.setAvaliacao(new BigDecimal("4.5"));
             produto10.setStatus(Product.Status.ATIVO);
             productRepository.save(produto10);
 
             Product produto11 = new Product();
-            produto11.setCodigo("KEY001");
-            produto11.setNome("Teclado Mecânico Corsair");
-            produto11.setDescricao("Teclado Mecânico Gamer Corsair K70 RGB MK.2 Cherry MX");
-            produto11.setPreco(new BigDecimal("599.99"));
-            produto11.setQuantidadeEstoque(12);
+            produto11.setCodigo("SAIA001");
+            produto11.setNome("Saia Rodada Infantil");
+            produto11.setDescricao("Saia rodada infantil em tecido de algodão com elastano. Estampa floral delicada e cores suaves. Cós alto com elástico para maior conforto. Ideal para ocasiões especiais e festas.");
+            produto11.setPreco(new BigDecimal("59.90"));
+            produto11.setQuantidadeEstoque(28);
+            produto11.setAvaliacao(new BigDecimal("4.0"));
             produto11.setStatus(Product.Status.ATIVO);
             productRepository.save(produto11);
 
+            // Produtos com estoque zerado (inativos)
             Product produto12 = new Product();
-            produto12.setCodigo("PRINT001");
-            produto12.setNome("Impressora HP DeskJet");
-            produto12.setDescricao("Impressora Multifuncional HP DeskJet 2774 Jato de Tinta Wi-Fi");
-            produto12.setPreco(new BigDecimal("399.99"));
-            produto12.setQuantidadeEstoque(18);
-            produto12.setStatus(Product.Status.ATIVO);
+            produto12.setCodigo("JAQUETA001");
+            produto12.setNome("Jaqueta Jeans Feminina");
+            produto12.setDescricao("Jaqueta jeans feminina oversized com lavação desgastada. Possui bolsos frontais e fechamento com botões metálicos. Modelagem confortável e versátil para diversas combinações. Tecido de alta qualidade.");
+            produto12.setPreco(new BigDecimal("179.90"));
+            produto12.setQuantidadeEstoque(0);
+            produto12.setAvaliacao(new BigDecimal("3.5"));
+            produto12.setStatus(Product.Status.INATIVO);
             productRepository.save(produto12);
 
-            System.out.println("12 produtos de exemplo criados no sistema");
+            System.out.println("12 produtos de roupas de exemplo criados no sistema");
         }
     }
 }
