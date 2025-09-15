@@ -37,7 +37,21 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
             System.out.println("Administrador padrão criado: admin@gmail.com / Admin123");
         }
-        
+
+        // Verifica se já existe o estoquista padrão
+        if (userRepository.findByEmail("estoquista@gmail.com").isEmpty()) {
+            User estoquista = new User();
+            estoquista.setNome("Estoquista");
+            estoquista.setCpf("11111111111");
+            estoquista.setEmail("estoquista@gmail.com");
+            estoquista.setSenha(passwordEncoder.encode("Estoque123"));
+            estoquista.setTipo(User.TipoUsuario.EXTERNO);
+            estoquista.setStatus(User.Status.ATIVO);
+            
+            userRepository.save(estoquista);
+            System.out.println("Estoquista padrão criado: estoquista@gmail.com / Estoque123");
+        }
+
         // Cria produtos de roupas de exemplo se não existirem
         if (productRepository.count() == 0) {
             // Roupas Femininas

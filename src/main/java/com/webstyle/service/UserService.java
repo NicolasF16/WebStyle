@@ -36,7 +36,7 @@ public class UserService {
         // Define status como ATIVO por padrão
         user.setStatus(Status.ATIVO);
         
-        
+        // Define tipo como EXTERNO por padrão se não especificado
         if (user.getTipo() == null) {
             user.setTipo(TipoUsuario.EXTERNO);
         }
@@ -49,9 +49,8 @@ public class UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             
-            // Verifica se é usuário BACKOFFICE 
-            // Verifica a senha
-            if (user.getTipo() == TipoUsuario.BACKOFFICE &&
+            // Agora permite tanto BACKOFFICE quanto EXTERNO
+            if ((user.getTipo() == TipoUsuario.BACKOFFICE || user.getTipo() == TipoUsuario.EXTERNO) &&
                 user.getStatus() == Status.ATIVO &&
                 passwordEncoder.matches(senha, user.getSenha())) {
                 return Optional.of(user);

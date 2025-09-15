@@ -32,9 +32,9 @@ public class ProductController {
     public String listarProdutos(@RequestParam(defaultValue = "0") int pagina,
                                 @RequestParam(required = false) String busca,
                                 Model model, HttpSession session) {
-        // Verifica se usuário está logado e é administrador
+        // Verifica se usuário está logado (agora tanto BACKOFFICE quanto EXTERNO podem acessar)
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
-        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+        if (usuarioLogado == null) {
             return "redirect:/login";
         }
         
@@ -50,6 +50,7 @@ public class ProductController {
         model.addAttribute("paginaAtual", pagina);
         model.addAttribute("totalPaginas", produtos.getTotalPages());
         model.addAttribute("totalElementos", produtos.getTotalElements());
+        model.addAttribute("isAdmin", usuarioLogado.getTipo() == User.TipoUsuario.BACKOFFICE);
         
         return "product-list";
     }
@@ -107,7 +108,7 @@ public class ProductController {
     @GetMapping("/visualizar/{id}")
     public String visualizarProduto(@PathVariable Long id, Model model, HttpSession session) {
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
-        if (usuarioLogado == null || usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+        if (usuarioLogado == null) {
             return "redirect:/login";
         }
         
@@ -120,6 +121,7 @@ public class ProductController {
         
         model.addAttribute("produto", produto);
         model.addAttribute("imagens", imagens);
+        model.addAttribute("isAdmin", usuarioLogado.getTipo() == User.TipoUsuario.BACKOFFICE);
         return "product-view-enhanced";
     }
 
