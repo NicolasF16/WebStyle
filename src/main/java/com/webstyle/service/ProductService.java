@@ -72,6 +72,25 @@ public class ProductService {
         return produtoSalvo;
     }
 
+    public void alterarEstoque(Long id, Integer novaQuantidade) {
+    if (id == null) {
+        throw new RuntimeException("ID do produto é obrigatório");
+    }
+    
+    if (novaQuantidade == null || novaQuantidade < 0) {
+        throw new RuntimeException("Quantidade deve ser um número não negativo");
+    }
+    
+    Optional<Product> productOpt = productRepository.findById(id);
+    if (!productOpt.isPresent()) {
+        throw new RuntimeException("Produto não encontrado com ID: " + id);
+    }
+    
+    Product produto = productOpt.get();
+    produto.setQuantidadeEstoque(novaQuantidade);
+    productRepository.save(produto);
+}
+
     // CORREÇÃO: Validação mais robusta dos dados do produto
     private void validarDadosProduto(Product produto) {
         // Validação do código

@@ -51,11 +51,12 @@ public class ProductController {
         model.addAttribute("totalPaginas", produtos.getTotalPages());
         model.addAttribute("totalElementos", produtos.getTotalElements());
         model.addAttribute("isAdmin", usuarioLogado.getTipo() == User.TipoUsuario.BACKOFFICE);
+        model.addAttribute("isEstoquista", usuarioLogado.getTipo() == User.TipoUsuario.EXTERNO);
         
         return "product-list";
     }
 
-    // Formulário para cadastrar novo produto
+    // Formulário para cadastrar novo produto - APENAS ADMINS
     @GetMapping("/novo")
     public String novoProdutoForm(Model model, HttpSession session) {
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
@@ -63,8 +64,8 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
-            usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
+        // RESTRIÇÃO: Apenas admins podem cadastrar novos produtos
+        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
             return "redirect:/produtos";
         }
         
@@ -72,7 +73,7 @@ public class ProductController {
         return "product-form-enhanced";
     }
 
-    // CORREÇÃO: Cadastra novo produto com imagens - separando os parâmetros corretamente
+    // Cadastra novo produto com imagens - APENAS ADMINS
     @PostMapping("/cadastro")
     public String cadastrarProduto(@RequestParam("codigo") String codigo,
                                   @RequestParam("nome") String nome,
@@ -92,8 +93,8 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
-            usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
+        // RESTRIÇÃO: Apenas admins podem cadastrar produtos
+        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
             return "redirect:/produtos";
         }
         
@@ -213,10 +214,11 @@ public class ProductController {
         model.addAttribute("produto", produto);
         model.addAttribute("imagens", imagens);
         model.addAttribute("isAdmin", usuarioLogado.getTipo() == User.TipoUsuario.BACKOFFICE);
+        model.addAttribute("isEstoquista", usuarioLogado.getTipo() == User.TipoUsuario.EXTERNO);
         return "product-view-enhanced";
     }
 
-    // Formulário para editar produto
+    // Formulário para editar produto - DIFERENCIADO POR TIPO DE USUÁRIO
     @GetMapping("/editar/{id}")
     public String editarProdutoForm(@PathVariable Long id, Model model, HttpSession session) {
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
@@ -238,10 +240,56 @@ public class ProductController {
         
         model.addAttribute("produto", produto);
         model.addAttribute("imagens", imagens);
-        return "product-edit-enhanced";
+        model.addAttribute("isAdmin", usuarioLogado.getTipo() == User.TipoUsuario.BACKOFFICE);
+        model.addAttribute("isEstoquista", usuarioLogado.getTipo() == User.TipoUsuario.EXTERNO);
+        
+        // DIFERENCIAÇÃO: Estoquistas vão para tela específica
+        if (usuarioLogado.getTipo() == User.TipoUsuario.EXTERNO) {
+            return "product-edit-stock"; // Nova tela apenas para edição de estoque
+        } else {
+            return "product-edit-enhanced"; // Tela completa para admins
+        }
     }
 
-    // CORREÇÃO: Salva alterações do produto - usando parâmetros individuais
+    // NOVO: Endpoint específico para alterar apenas estoque - ESTOQUISTAS
+    @PostMapping("/alterar-estoque/{id}")
+    public String alterarEstoque(@PathVariable Long id,
+                                @RequestParam("quantidadeEstoque") Integer quantidadeEstoque,
+                                Model model, 
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+        
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        if (usuarioLogado == null) {
+            return "redirect:/login";
+        }
+        
+        // RESTRIÇÃO: Apenas estoquistas podem usar este endpoint
+        if (usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
+            redirectAttributes.addFlashAttribute("erro", "Acesso não autorizado");
+            return "redirect:/produtos";
+        }
+        
+        try {
+            // Validação da quantidade
+            if (quantidadeEstoque == null || quantidadeEstoque < 0) {
+                throw new RuntimeException("Quantidade deve ser um número não negativo");
+            }
+            
+            productService.alterarEstoque(id, quantidadeEstoque);
+            redirectAttributes.addFlashAttribute("sucesso", "Estoque atualizado com sucesso!");
+            return "redirect:/produtos";
+            
+        } catch (Exception e) {
+            Product produto = productService.buscarPorId(id);
+            model.addAttribute("erro", "Erro ao alterar estoque: " + e.getMessage());
+            model.addAttribute("produto", produto);
+            model.addAttribute("isEstoquista", true);
+            return "product-edit-stock";
+        }
+    }
+
+    // Salva alterações do produto COMPLETAS - APENAS ADMINS
     @PostMapping("/alterar/{id}")
     public String alterarProduto(@PathVariable Long id,
                                 @RequestParam("codigo") String codigo,
@@ -263,8 +311,9 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
-            usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
+        // RESTRIÇÃO: Apenas admins podem fazer alteração completa
+        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            redirectAttributes.addFlashAttribute("erro", "Apenas administradores podem alterar todos os dados do produto");
             return "redirect:/produtos";
         }
         
@@ -347,7 +396,7 @@ public class ProductController {
         return produto;
     }
 
-    // Altera status do produto (ativo/inativo)
+    // Altera status do produto (ativo/inativo) - APENAS ADMINS
     @PostMapping("/status/{id}")
     public String alterarStatus(@PathVariable Long id, @RequestParam Product.Status status, 
                                HttpSession session, RedirectAttributes redirectAttributes) {
@@ -367,7 +416,7 @@ public class ProductController {
         return "redirect:/produtos";
     }
 
-    // Endpoint AJAX para definir imagem principal
+    // Endpoint AJAX para definir imagem principal - APENAS ADMINS
     @PostMapping("/imagem-principal/{produtoId}/{imagemId}")
     @ResponseBody
     public ResponseEntity<String> definirImagemPrincipal(@PathVariable Long produtoId, 
@@ -378,9 +427,9 @@ public class ProductController {
             return ResponseEntity.status(403).body("Não autorizado");
         }
         
-        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
-            usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
-            return ResponseEntity.status(403).body("Não autorizado");
+        // RESTRIÇÃO: Apenas admins podem alterar imagem principal
+        if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE) {
+            return ResponseEntity.status(403).body("Apenas administradores podem alterar a imagem principal");
         }
         
         try {

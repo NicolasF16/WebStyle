@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Alterar Estoque - Produto</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <style>
+        .stock-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .product-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            flex-basis: 40%;
+        }
+
+        .info-value {
+            color: #6c757d;
+            flex-basis: 60%;
+            text-align: right;
+        }
+
+        .current-stock {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .stock-form {
+            background: #e8f4fd;
+            border: 2px solid #0074d9;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stock-input-group {
+            margin: 20px 0;
+        }
+
+        .stock-input {
+            width: 150px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #0074d9;
+            border-radius: 8px;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .stock-input:focus {
+            outline: none;
+            border-color: #005fa3;
+            box-shadow: 0 0 10px rgba(0, 116, 217, 0.3);
+        }
+
+        .stock-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn-stock {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-update {
+            background: #28a745;
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn-update:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #545b62;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-quick {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .btn-quick:hover {
+            background: #138496;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border: 1px solid #f1aeb5;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .title-header {
+            text-align: center;
+            color: #0074d9;
+            margin-bottom: 25px;
+        }
+
+        .stock-icon {
+            font-size: 48px;
+            color: #0074d9;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .stock-container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+
+            .stock-input {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .stock-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-stock {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stock-container">
+        <div class="title-header">
+            <div class="stock-icon">📦</div>
+            <h2>Alterar Quantidade em Estoque</h2>
+            <p><small>Estoquista: <span th:text="${session.usuarioLogado.nome}"></span></small></p>
+        </div>
+
+        <!-- Mensagens -->
+        <div th:if="${erro}" class="error-message" th:text="${erro}"></div>
+        <div th:if="${sucesso}" class="success-message" th:text="${sucesso}"></div>
+
+        <!-- Informações do produto -->
+        <div class="product-info">
+            <h3 style="color: #0074d9; margin-bottom: 15px;">📋 Informações do Produto</h3>
+            <div class="info-row">
+                <span class="info-label">Código:</span>
+                <span class="info-value" th:text="${produto.codigo}"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Nome:</span>
+                <span class="info-value" th:text="${produto.nome}"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Preço:</span>
+                <span class="info-value">R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}"></span></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="info-value" th:text="${produto.status == 'ATIVO' ? '✅ Ativo' : '❌ Inativo'}"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Estoque Atual:</span>
+                <span class="info-value current-stock" th:text="${produto.quantidadeEstoque} + ' unidades'"></span>
+            </div>
+        </div>
+
+        <!-- Aviso para estoquistas -->
+        <div class="warning-box">
+            ⚠️ <strong>Atenção:</strong> Como estoquista, você pode alterar apenas a quantidade em estoque. 
+            Outros dados do produto só podem ser modificados por administradores.
+        </div>
+
+        <!-- Formulário de alteração de estoque -->
+        <form th:action="@{'/produtos/alterar-estoque/' + ${produto.id}}" method="post" id="stockForm">
+            <div class="stock-form">
+                <h3 style="color: #0074d9; margin-bottom: 20px;">🔄 Nova Quantidade</h3>
+                
+                <div class="stock-input-group">
+                    <label for="quantidadeEstoque" style="display: block; margin-bottom: 10px; font-weight: bold;">
+                        Digite a nova quantidade em estoque:
+                    </label>
+                    <input type="number" 
+                           id="quantidadeEstoque" 
+                           name="quantidadeEstoque" 
+                           th:value="${produto.quantidadeEstoque}"
+                           min="0" 
+                           required 
+                           class="stock-input"
+                           placeholder="0">
+                    <small style="display: block; margin-top: 10px; color: #6c757d;">
+                        Quantidade atual: <strong th:text="${produto.quantidadeEstoque}"></strong> unidades
+                    </small>
+                </div>
+
+                <!-- Ações rápidas -->
+                <div class="quick-actions">
+                    <button type="button" class="btn-quick" onclick="adjustStock(-10)">-10</button>
+                    <button type="button" class="btn-quick" onclick="adjustStock(-5)">-5</button>
+                    <button type="button" class="btn-quick" onclick="adjustStock(-1)">-1</button>
+                    <button type="button" class="btn-quick" onclick="resetStock()">Reset</button>
+                    <button type="button" class="btn-quick" onclick="adjustStock(1)">+1</button>
+                    <button type="button" class="btn-quick" onclick="adjustStock(5)">+5</button>
+                    <button type="button" class="btn-quick" onclick="adjustStock(10)">+10</button>
+                </div>
+
+                <div class="stock-buttons">
+                    <button type="submit" class="btn-stock btn-update">
+                        💾 Atualizar Estoque
+                    </button>
+                    <a th:href="@{/produtos}" class="btn-stock btn-cancel">
+                        ❌ Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Informações adicionais -->
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+            <p style="color: #6c757d; font-size: 14px;">
+                💡 <strong>Dica:</strong> Use os botões de ação rápida para ajustar facilmente a quantidade.<br>
+                Para alterações nos outros dados do produto, entre em contato com um administrador.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const originalStock = parseInt(document.getElementById('quantidadeEstoque').value);
+        
+        // Função para ajustar estoque com botões rápidos
+        function adjustStock(amount) {
+            const input = document.getElementById('quantidadeEstoque');
+            let currentValue = parseInt(input.value) || 0;
+            let newValue = currentValue + amount;
+            
+            // Não permite valores negativos
+            if (newValue < 0) {
+                newValue = 0;
+            }
+            
+            input.value = newValue;
+            input.focus();
+            
+            // Adiciona efeito visual
+            input.style.backgroundColor = '#e3f2fd';
+            setTimeout(() => {
+                input.style.backgroundColor = '';
+            }, 300);
+        }
+        
+        // Função para resetar ao valor original
+        function resetStock() {
+            const input = document.getElementById('quantidadeEstoque');
+            input.value = originalStock;
+            input.focus();
+            
+            // Adiciona efeito visual
+            input.style.backgroundColor = '#fff3e0';
+            setTimeout(() => {
+                input.style.backgroundColor = '';
+            }, 300);
+        }
+        
+        // Validação do formulário
+        document.getElementById('stockForm').addEventListener('submit', function(e) {
+            const quantidade = parseInt(document.getElementById('quantidadeEstoque').value);
+            
+            if (isNaN(quantidade) || quantidade < 0) {
+                alert('Por favor, digite uma quantidade válida (número não negativo).');
+                e.preventDefault();
+                return;
+            }
+            
+            // Confirma alterações significativas
+            const difference = Math.abs(quantidade - originalStock);
+            if (difference > 100) {
+                if (!confirm(`Você está alterando o estoque em ${difference} unidades.\nDeseja continuar?`)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+            // Confirma zeragem do estoque
+            if (quantidade === 0 && originalStock > 0) {
+                if (!confirm('Você está definindo o estoque como ZERO.\nIsso significa que o produto ficará sem estoque.\nDeseja continuar?')) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+        
+        // Permite usar Enter para submeter
+        document.getElementById('quantidadeEstoque').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('stockForm').submit();
+            }
+        });
+        
+        // Foco automático no campo
+        window.addEventListener('load', function() {
+            document.getElementById('quantidadeEstoque').focus();
+            document.getElementById('quantidadeEstoque').select();
+        });
+        
+        // Feedback visual para mudanças
+        document.getElementById('quantidadeEstoque').addEventListener('input', function() {
+            const currentValue = parseInt(this.value) || 0;
+            const difference = currentValue - originalStock;
+            
+            if (difference > 0) {
+                this.style.borderColor = '#28a745';
+                this.style.color = '#28a745';
+            } else if (difference < 0) {
+                this.style.borderColor = '#dc3545';
+                this.style.color = '#dc3545';
+            } else {
+                this.style.borderColor = '#0074d9';
+                this.style.color = '#333';
+            }
+        });
+    </script>
+</body>
+</html>
