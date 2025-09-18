@@ -28,7 +28,7 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByEmail("admin@gmail.com").isEmpty()) {
             User admin = new User();
             admin.setNome("Administrador");
-            admin.setCpf("00000000000");
+            admin.setCpf("52998224725");
             admin.setEmail("admin@gmail.com");
             admin.setSenha(passwordEncoder.encode("Admin123"));
             admin.setTipo(User.TipoUsuario.BACKOFFICE);
@@ -42,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByEmail("estoquista@gmail.com").isEmpty()) {
             User estoquista = new User();
             estoquista.setNome("Estoquista");
-            estoquista.setCpf("11111111111");
+            estoquista.setCpf("98765432100");
             estoquista.setEmail("estoquista@gmail.com");
             estoquista.setSenha(passwordEncoder.encode("Estoque123"));
             estoquista.setTipo(User.TipoUsuario.EXTERNO);

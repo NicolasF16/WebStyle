@@ -5,97 +5,252 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="/style.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
         .product-container {
-            max-width: 1000px;
-            margin: 20px auto;
+            max-width: 1200px;
+            margin: 0 auto;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .product-header {
-            background: #0074d9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px 30px;
+            padding: 30px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .product-title {
+            font-size: 32px;
+            font-weight: 700;
             margin: 0;
-            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .product-badges {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .product-code {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .status-badge {
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-ativo {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .status-inativo {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
         }
 
         .product-content {
             display: flex;
-            gap: 30px;
-            padding: 30px;
+            gap: 40px;
+            padding: 40px;
         }
 
+        /* Carrossel de Imagens */
         .product-images {
             flex: 1;
-            max-width: 400px;
+            min-width: 0;
+            max-width: 500px;
         }
 
-        .main-image {
-            width: 100%;
-            height: 300px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 15px;
+        .carousel-container {
+            position: relative;
             background: #f8f9fa;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .carousel-main {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .main-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
         .no-image {
-            color: #666;
-            font-size: 16px;
             text-align: center;
+            color: #9ca3af;
+        }
+
+        .no-image-icon {
+            font-size: 80px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            pointer-events: none;
+        }
+
+        .carousel-btn {
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0,0,0,0.7);
+            transform: scale(1.1);
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.3);
         }
 
         .image-thumbnails {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
+            margin-top: 20px;
+            overflow-x: auto;
+            padding: 5px;
         }
 
         .thumbnail {
-            width: 60px;
-            height: 60px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
+            min-width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
+            border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
             position: relative;
+            background: #f8f9fa;
         }
 
         .thumbnail:hover {
-            border-color: #0074d9;
+            border-color: #667eea;
+            transform: scale(1.05);
         }
 
         .thumbnail.active {
-            border-color: #28a745;
-            border-width: 3px;
+            border-color: #764ba2;
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
         }
 
         .thumbnail img {
@@ -104,69 +259,96 @@
             object-fit: cover;
         }
 
-        .principal-indicator {
+        .thumbnail .principal-badge {
             position: absolute;
-            top: 2px;
-            right: 2px;
-            background: #28a745;
-            color: white;
-            font-size: 8px;
-            padding: 1px 3px;
-            border-radius: 2px;
+            top: 4px;
+            right: 4px;
+            background: #fbbf24;
+            color: #000;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
             font-weight: bold;
         }
 
+        /* Detalhes do Produto */
         .product-details {
-            flex: 2;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .price-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-section::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .price-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .price-value {
+            font-size: 42px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         .details-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .detail-item {
+        .detail-card {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #0074d9;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .detail-label {
-            font-weight: bold;
-            color: #0074d9;
             font-size: 12px;
+            color: #6b7280;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .detail-value {
-            font-size: 16px;
-            color: #333;
-            margin: 0;
-        }
-
-        .description-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .description-title {
-            color: #0074d9;
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .description-text {
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
+            font-size: 18px;
+            color: #1f2937;
+            font-weight: 600;
         }
 
         .rating-display {
@@ -176,78 +358,18 @@
         }
 
         .stars {
-            color: #ffc107;
-            font-size: 18px;
+            color: #fbbf24;
+            font-size: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .rating-number {
-            background: #0074d9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-ativo {
-            background: #28a745;
-            color: white;
-        }
-
-        .status-inativo {
-            background: #dc3545;
-            color: white;
-        }
-
-        .product-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-edit {
-            background: #ffc107;
-            color: #000;
-        }
-
-        .btn-edit:hover {
-            background: #e0a800;
-        }
-
-        .btn-back {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-back:hover {
-            background: #545b62;
-        }
-
-        .price-highlight {
-            font-size: 24px;
-            font-weight: bold;
-            color: #28a745;
+            font-size: 14px;
+            font-weight: 600;
         }
 
         .stock-info {
@@ -257,46 +379,134 @@
         }
 
         .stock-number {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .stock-low {
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .stock-medium {
-            color: #ffc107;
+            color: #f59e0b;
         }
 
         .stock-good {
-            color: #28a745;
+            color: #10b981;
         }
 
-        @media (max-width: 768px) {
-            .product-container {
-                margin: 10px;
+        .description-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .description-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .description-text {
+            line-height: 1.8;
+            color: #4b5563;
+            font-size: 16px;
+        }
+
+        /* Ações do Produto */
+        .product-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 30px 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(107, 114, 128, 0.4);
+        }
+
+        /* Responsivo */
+        @media (max-width: 968px) {
+            .product-content {
+                flex-direction: column;
+            }
+
+            .product-images {
+                max-width: 100%;
+            }
+
+            .carousel-main {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .product-header {
+                padding: 20px;
+            }
+
+            .product-title {
+                font-size: 24px;
             }
 
             .product-content {
-                flex-direction: column;
-                gap: 20px;
                 padding: 20px;
+                gap: 30px;
+            }
+
+            .price-value {
+                font-size: 32px;
             }
 
             .details-grid {
                 grid-template-columns: 1fr;
-                gap: 15px;
             }
 
-            .product-header {
+            .product-actions {
                 flex-direction: column;
-                gap: 10px;
-                text-align: center;
+                padding: 20px;
             }
 
-            .main-image {
-                height: 250px;
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -305,166 +515,200 @@
     <div class="product-container">
         <!-- Cabeçalho do produto -->
         <div class="product-header">
-            <h1 class="product-title" th:text="${produto.nome}"></h1>
-            <span class="product-code" th:text="'Código: ' + ${produto.codigo}"></span>
+            <div class="header-content">
+                <h1 class="product-title" th:text="${produto.nome}">Nome do Produto</h1>
+                <div class="product-badges">
+                    <span class="product-code" th:text="'CÓD: ' + ${produto.codigo}">CÓD: XXXXX</span>
+                    <span class="status-badge" 
+                          th:classappend="${produto.status.toString() == 'ATIVO'} ? 'status-ativo' : 'status-inativo'"
+                          th:text="${produto.status}">ATIVO</span>
+                </div>
+            </div>
         </div>
 
         <!-- Conteúdo principal -->
         <div class="product-content">
-            <!-- Seção de imagens -->
+            <!-- Carrossel de imagens -->
             <div class="product-images">
-                <div class="main-image" id="mainImage">
-                    <div th:if="${imagens.size() > 0}">
-                        <img th:src="'/' + ${imagens[0].caminhoArquivo}" 
-                             th:alt="${produto.nome}" 
-                             id="mainImg">
-                    </div>
-                    <div th:unless="${imagens.size() > 0}" class="no-image">
-                        📷 Sem imagem disponível
+                <div class="carousel-container">
+                    <div class="carousel-main" id="carouselMain">
+                        <!-- Imagens do carrossel -->
+                        <div th:if="${imagens != null and !imagens.isEmpty()}">
+                            <div th:each="imagem,iter : ${imagens}" 
+                                 class="carousel-slide"
+                                 th:classappend="${iter.index == 0} ? 'active' : ''"
+                                 th:attr="data-slide=${iter.index}">
+                                <img th:src="@{/{path}(path=${imagem.caminhoArquivo})}" 
+                                     th:alt="${produto.nome}">
+                            </div>
+                            
+                            <!-- Controles do carrossel -->
+                            <div class="carousel-controls" th:if="${imagens.size() > 1}">
+                                <button class="carousel-btn" onclick="changeSlide(-1)">‹</button>
+                                <button class="carousel-btn" onclick="changeSlide(1)">›</button>
+                            </div>
+                            
+                            <!-- Indicadores -->
+                            <div class="carousel-indicators" th:if="${imagens.size() > 1}">
+                                <span th:each="imagem,iter : ${imagens}" 
+                                      class="indicator"
+                                      th:classappend="${iter.index == 0} ? 'active' : ''"
+                                      th:onclick="'goToSlide(' + ${iter.index} + ')'"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Sem imagem -->
+                        <div th:unless="${imagens != null and !imagens.isEmpty()}" class="no-image">
+                            <div class="no-image-icon">📷</div>
+                            <p>Sem imagem disponível</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Miniaturas -->
-                <div class="image-thumbnails" th:if="${imagens.size() > 0}">
-                    <div class="thumbnail" 
-                         th:each="imagem,iter : ${imagens}" 
+                <div class="image-thumbnails" th:if="${imagens != null and !imagens.isEmpty()}">
+                    <div class="thumbnail"
+                         th:each="imagem,iter : ${imagens}"
                          th:classappend="${iter.index == 0} ? 'active' : ''"
-                         th:onclick="'changeMainImage(\'' + ${imagem.caminhoArquivo} + '\', ' + ${iter.index} + ')'">
-                        <img th:src="'/' + ${imagem.caminhoArquivo}" th:alt="'Imagem ' + ${iter.index + 1}">
-                        <div class="principal-indicator" th:if="${imagem.imagemPrincipal}">★</div>
+                         th:onclick="'goToSlide(' + ${iter.index} + ')'">
+                        <img th:src="@{/{path}(path=${imagem.caminhoArquivo})}" 
+                             th:alt="'Imagem ' + ${iter.index + 1}">
+                        <div class="principal-badge" th:if="${imagem.imagemPrincipal}">★</div>
                     </div>
                 </div>
             </div>
 
             <!-- Detalhes do produto -->
             <div class="product-details">
-                <div class="details-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">Preço</div>
-                        <div class="detail-value price-highlight">
-                            R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}"></span>
-                        </div>
+                <!-- Seção de Preço -->
+                <div class="price-section">
+                    <div class="price-label">Preço</div>
+                    <div class="price-value">
+                        R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}">0,00</span>
                     </div>
+                </div>
 
-                    <div class="detail-item">
+                <!-- Grid de detalhes -->
+                <div class="details-grid">
+                    <div class="detail-card">
                         <div class="detail-label">Avaliação</div>
                         <div class="detail-value">
                             <div class="rating-display">
-                                <span class="stars" th:text="${#strings.repeat('⭐', produto.avaliacao.intValue())}"></span>
-                                <span class="rating-number" th:text="${produto.avaliacao}"></span>
+                                <span class="stars" 
+                                      th:utext="${#strings.repeat('⭐', produto.avaliacao != null ? produto.avaliacao.intValue() : 0)}">⭐⭐⭐</span>
+                                <span class="rating-number" 
+                                      th:text="${produto.avaliacao != null ? produto.avaliacao : '0.0'}">0.0</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="detail-item">
+                    <div class="detail-card">
                         <div class="detail-label">Estoque</div>
                         <div class="detail-value">
                             <div class="stock-info">
-                                <span class="stock-number" 
+                                <span class="stock-number"
                                       th:classappend="${produto.quantidadeEstoque <= 5} ? 'stock-low' : (${produto.quantidadeEstoque <= 15} ? 'stock-medium' : 'stock-good')"
-                                      th:text="${produto.quantidadeEstoque} + ' unidades'"></span>
+                                      th:text="${produto.quantidadeEstoque} + ' unidades'">0 unidades</span>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="detail-item">
-                        <div class="detail-label">Status</div>
-                        <div class="detail-value">
-                            <span class="status-badge" 
-                                  th:classappend="${produto.status == 'ATIVO'} ? 'status-ativo' : 'status-inativo'"
-                                  th:text="${produto.status}"></span>
-                        </div>
-                    </div>
-
-                    <div class="detail-item">
-                        <div class="detail-label">Data de Criação</div>
-                        <div class="detail-value" th:text="${#temporals.format(produto.dataCriacao, 'dd/MM/yyyy HH:mm')}"></div>
-                    </div>
-
-                    <div class="detail-item" th:if="${produto.dataAtualizacao}">
-                        <div class="detail-label">Última Atualização</div>
-                        <div class="detail-value" th:text="${#temporals.format(produto.dataAtualizacao, 'dd/MM/yyyy HH:mm')}"></div>
                     </div>
                 </div>
 
                 <!-- Descrição -->
-                <div class="description-section" th:if="${produto.descricao}">
+                <div class="description-section" th:if="${produto.descricao != null and !produto.descricao.isEmpty()}">
                     <div class="description-title">Descrição do Produto</div>
-                    <p class="description-text" th:text="${produto.descricao}"></p>
-                </div>
-
-                <!-- Informações das imagens -->
-                <div class="description-section" th:if="${imagens.size() > 0}">
-                    <div class="description-title">Informações das Imagens</div>
-                    <p class="description-text">
-                        <strong>Total de imagens:</strong> <span th:text="${imagens.size()}"></span><br>
-                        <strong>Imagem principal:</strong> 
-                        <span th:text="${imagens.stream().filter(img -> img.imagemPrincipal).findFirst().map(img -> img.nomeOriginal).orElse('Não definida')}"></span>
-                    </p>
+                    <p class="description-text" th:text="${produto.descricao}">Descrição do produto...</p>
                 </div>
             </div>
         </div>
 
         <!-- Ações -->
         <div class="product-actions">
-            <a th:href="@{'/produtos/editar/' + ${produto.id}}" class="btn btn-edit">✏️ Editar Produto</a>
-            <a th:href="@{/produtos}" class="btn btn-back">⬅️ Voltar à Lista</a>
+            <button class="btn btn-buy" disabled title="Funcionalidade em desenvolvimento">
+                🛒 Comprar (Em breve)
+            </button>
+            <a th:href="@{/produtos}" class="btn btn-back">
+                ← Voltar à Lista
+            </a>
         </div>
     </div>
 
-    <script>
-        function changeMainImage(imagePath, index) {
-            // Atualiza a imagem principal
-            const mainImg = document.getElementById('mainImg');
-            if (mainImg) {
-                mainImg.src = '/' + imagePath;
-            }
+    <script th:inline="javascript">
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            if (totalSlides === 0) return;
             
-            // Atualiza a classe ativa das miniaturas
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            thumbnails.forEach((thumbnail, i) => {
-                thumbnail.classList.toggle('active', i === index);
+            // Ajustar índice
+            if (index >= totalSlides) currentSlide = 0;
+            else if (index < 0) currentSlide = totalSlides - 1;
+            else currentSlide = index;
+
+            // Atualizar slides
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+            });
+
+            // Atualizar indicadores
+            if (indicators.length > 0) {
+                indicators.forEach((indicator, i) => {
+                    indicator.classList.toggle('active', i === currentSlide);
+                });
+            }
+
+            // Atualizar miniaturas
+            if (thumbnails.length > 0) {
+                thumbnails.forEach((thumb, i) => {
+                    thumb.classList.toggle('active', i === currentSlide);
+                });
+            }
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        // Auto-play do carrossel (opcional)
+        if (totalSlides > 1) {
+            setInterval(() => {
+                changeSlide(1);
+            }, 5000); // Muda a cada 5 segundos
+        }
+
+        // Navegação por teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Touch/Swipe para mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        const carouselMain = document.getElementById('carouselMain');
+        if (carouselMain) {
+            carouselMain.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            carouselMain.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
             });
         }
 
-        // Adiciona efeito de zoom na imagem principal
-        document.addEventListener('DOMContentLoaded', function() {
-            const mainImg = document.getElementById('mainImg');
-            if (mainImg) {
-                mainImg.addEventListener('click', function() {
-                    // Cria overlay para zoom
-                    const overlay = document.createElement('div');
-                    overlay.style.cssText = `
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0,0,0,0.8);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        z-index: 1000;
-                        cursor: pointer;
-                    `;
-                    
-                    const zoomedImg = document.createElement('img');
-                    zoomedImg.src = this.src;
-                    zoomedImg.style.cssText = `
-                        max-width: 90%;
-                        max-height: 90%;
-                        object-fit: contain;
-                    `;
-                    
-                    overlay.appendChild(zoomedImg);
-                    document.body.appendChild(overlay);
-                    
-                    overlay.addEventListener('click', function() {
-                        document.body.removeChild(overlay);
-                    });
-                });
-            }
-        });
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) changeSlide(1); // Swipe left
+            if (touchEndX > touchStartX + 50) changeSlide(-1); // Swipe right
+        }
     </script>
 </body>
 </html>
