@@ -33,7 +33,6 @@ public class ProductController {
     public String listarProdutos(@RequestParam(defaultValue = "0") int pagina,
                                 @RequestParam(required = false) String busca,
                                 Model model, HttpSession session) {
-        // Verifica se usuário está logado (BACKOFFICE e EXTERNO podem acessar)
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
         if (usuarioLogado == null) {
             return "redirect:/login";
@@ -56,7 +55,7 @@ public class ProductController {
         return "product-list";
     }
 
-    // Formulário para cadastrar novo produto - CORRIGIDO: Ambos tipos podem cadastrar
+    // Formulário para cadastrar novo produto
     @GetMapping("/novo")
     public String novoProdutoForm(Model model, HttpSession session) {
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
@@ -64,7 +63,6 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        // CORREÇÃO: Permite tanto BACKOFFICE quanto EXTERNO cadastrar produtos
         if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
             usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
             return "redirect:/produtos";
@@ -74,10 +72,15 @@ public class ProductController {
         return "product-form-enhanced";
     }
 
-    // Cadastra novo produto com imagens - CORRIGIDO
+    // CORREÇÃO: Cadastra novo produto com imagens - separando os parâmetros corretamente
     @PostMapping("/cadastro")
-    public String cadastrarProduto(@Valid @ModelAttribute Product produto, 
-                                  BindingResult result,
+    public String cadastrarProduto(@RequestParam("codigo") String codigo,
+                                  @RequestParam("nome") String nome,
+                                  @RequestParam(value = "descricao", required = false) String descricao,
+                                  @RequestParam("preco") BigDecimal preco,
+                                  @RequestParam("quantidadeEstoque") Integer quantidadeEstoque,
+                                  @RequestParam("avaliacao") BigDecimal avaliacao,
+                                  @RequestParam("status") String status,
                                   @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens,
                                   @RequestParam(value = "imagemPrincipal", required = false) String imagemPrincipalStr,
                                   Model model, 
@@ -89,27 +92,31 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        // CORREÇÃO: Permite tanto BACKOFFICE quanto EXTERNO cadastrar
         if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
             usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
             return "redirect:/produtos";
         }
         
-        // CORREÇÃO: Validações manuais adicionais
         try {
-            validarCamposProduto(produto, result);
+            // Cria o produto manualmente em vez de usar @ModelAttribute
+            Product produto = new Product();
+            produto.setCodigo(codigo);
+            produto.setNome(nome);
+            produto.setDescricao(descricao);
+            produto.setPreco(preco);
+            produto.setQuantidadeEstoque(quantidadeEstoque);
+            produto.setAvaliacao(avaliacao);
+            produto.setStatus(Product.Status.valueOf(status));
             
-            if (result.hasErrors()) {
-                StringBuilder erros = new StringBuilder("Campos inválidos: ");
-                result.getFieldErrors().forEach(error -> 
-                    erros.append(error.getField()).append(" (").append(error.getDefaultMessage()).append("), ")
-                );
+            // Validações manuais
+            String validationError = validarProduto(produto);
+            if (validationError != null) {
+                model.addAttribute("erro", validationError);
                 model.addAttribute("produto", produto);
-                model.addAttribute("erro", erros.toString());
                 return "product-form-enhanced";
             }
             
-            // CORREÇÃO: Conversão correta do índice da imagem principal
+            // Conversão do índice da imagem principal
             Long imagemPrincipalIndex = null;
             if (imagemPrincipalStr != null && !imagemPrincipalStr.trim().isEmpty()) {
                 try {
@@ -125,65 +132,67 @@ public class ProductController {
             
         } catch (IOException e) {
             model.addAttribute("erro", "Erro ao processar imagens: " + e.getMessage());
-            model.addAttribute("produto", produto);
             return "product-form-enhanced";
         } catch (Exception e) {
             model.addAttribute("erro", "Erro ao cadastrar produto: " + e.getMessage());
-            model.addAttribute("produto", produto);
             return "product-form-enhanced";
         }
     }
 
-    // NOVO: Método de validação manual
-    private void validarCamposProduto(Product produto, BindingResult result) {
+    // Método de validação manual
+    private String validarProduto(Product produto) {
+        StringBuilder erros = new StringBuilder();
+        
         // Validação do código
         if (produto.getCodigo() == null || produto.getCodigo().trim().isEmpty()) {
-            result.rejectValue("codigo", "error.codigo", "Código é obrigatório");
+            erros.append("Código é obrigatório. ");
         } else if (produto.getCodigo().length() > 50) {
-            result.rejectValue("codigo", "error.codigo", "Código deve ter no máximo 50 caracteres");
+            erros.append("Código deve ter no máximo 50 caracteres. ");
         }
         
         // Validação do nome
         if (produto.getNome() == null || produto.getNome().trim().isEmpty()) {
-            result.rejectValue("nome", "error.nome", "Nome é obrigatório");
+            erros.append("Nome é obrigatório. ");
         } else if (produto.getNome().length() > 200) {
-            result.rejectValue("nome", "error.nome", "Nome deve ter no máximo 200 caracteres");
+            erros.append("Nome deve ter no máximo 200 caracteres. ");
         }
         
         // Validação da descrição
         if (produto.getDescricao() != null && produto.getDescricao().length() > 2000) {
-            result.rejectValue("descricao", "error.descricao", "Descrição deve ter no máximo 2000 caracteres");
+            erros.append("Descrição deve ter no máximo 2000 caracteres. ");
         }
         
         // Validação do preço
         if (produto.getPreco() == null) {
-            result.rejectValue("preco", "error.preco", "Preço é obrigatório");
+            erros.append("Preço é obrigatório. ");
         } else if (produto.getPreco().compareTo(new BigDecimal("0.01")) < 0) {
-            result.rejectValue("preco", "error.preco", "Preço deve ser maior que zero");
+            erros.append("Preço deve ser maior que zero. ");
         }
         
         // Validação do estoque
         if (produto.getQuantidadeEstoque() == null) {
-            result.rejectValue("quantidadeEstoque", "error.quantidadeEstoque", "Quantidade em estoque é obrigatória");
+            erros.append("Quantidade em estoque é obrigatória. ");
         } else if (produto.getQuantidadeEstoque() < 0) {
-            result.rejectValue("quantidadeEstoque", "error.quantidadeEstoque", "Quantidade não pode ser negativa");
+            erros.append("Quantidade não pode ser negativa. ");
         }
         
         // Validação da avaliação
         if (produto.getAvaliacao() == null) {
-            produto.setAvaliacao(new BigDecimal("1.0")); // Valor padrão
+            erros.append("Avaliação é obrigatória. ");
         } else {
             BigDecimal avaliacao = produto.getAvaliacao();
             if (avaliacao.compareTo(new BigDecimal("1.0")) < 0 || 
                 avaliacao.compareTo(new BigDecimal("5.0")) > 0) {
-                result.rejectValue("avaliacao", "error.avaliacao", "Avaliação deve estar entre 1.0 e 5.0");
+                erros.append("Avaliação deve estar entre 1.0 e 5.0. ");
             }
         }
         
         // Validação do status
         if (produto.getStatus() == null) {
-            produto.setStatus(Product.Status.ATIVO); // Valor padrão
+            erros.append("Status é obrigatório. ");
         }
+        
+        return erros.length() > 0 ? erros.toString() : null;
     }
 
     // Visualizar detalhes do produto
@@ -207,7 +216,7 @@ public class ProductController {
         return "product-view-enhanced";
     }
 
-    // Formulário para editar produto - CORRIGIDO: Ambos tipos podem editar
+    // Formulário para editar produto
     @GetMapping("/editar/{id}")
     public String editarProdutoForm(@PathVariable Long id, Model model, HttpSession session) {
         User usuarioLogado = (User) session.getAttribute("usuarioLogado");
@@ -215,7 +224,6 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        // CORREÇÃO: Permite tanto BACKOFFICE quanto EXTERNO editar
         if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
             usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
             return "redirect:/produtos";
@@ -233,11 +241,16 @@ public class ProductController {
         return "product-edit-enhanced";
     }
 
-    // Salva alterações do produto - CORRIGIDO
+    // CORREÇÃO: Salva alterações do produto - usando parâmetros individuais
     @PostMapping("/alterar/{id}")
-    public String alterarProduto(@PathVariable Long id, 
-                                @Valid @ModelAttribute Product produto,
-                                BindingResult result,
+    public String alterarProduto(@PathVariable Long id,
+                                @RequestParam("codigo") String codigo,
+                                @RequestParam("nome") String nome,
+                                @RequestParam(value = "descricao", required = false) String descricao,
+                                @RequestParam("preco") BigDecimal preco,
+                                @RequestParam("quantidadeEstoque") Integer quantidadeEstoque,
+                                @RequestParam("avaliacao") BigDecimal avaliacao,
+                                @RequestParam("status") String status,
                                 @RequestParam(value = "novasImagens", required = false) List<MultipartFile> novasImagens,
                                 @RequestParam(value = "imagemPrincipal", required = false) String imagemPrincipalStr,
                                 @RequestParam(value = "imagensParaRemover", required = false) String imagensParaRemover,
@@ -250,28 +263,33 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        // CORREÇÃO: Permite tanto BACKOFFICE quanto EXTERNO editar
         if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
             usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
             return "redirect:/produtos";
         }
         
         try {
-            validarCamposProduto(produto, result);
+            // Cria o produto com os novos dados
+            Product produto = new Product();
+            produto.setCodigo(codigo);
+            produto.setNome(nome);
+            produto.setDescricao(descricao);
+            produto.setPreco(preco);
+            produto.setQuantidadeEstoque(quantidadeEstoque);
+            produto.setAvaliacao(avaliacao);
+            produto.setStatus(Product.Status.valueOf(status));
             
-            if (result.hasErrors()) {
+            // Validações
+            String validationError = validarProduto(produto);
+            if (validationError != null) {
                 List<ProductImage> imagens = productService.buscarImagensProduto(id);
-                StringBuilder erros = new StringBuilder("Campos inválidos: ");
-                result.getFieldErrors().forEach(error -> 
-                    erros.append(error.getField()).append(" (").append(error.getDefaultMessage()).append("), ")
-                );
+                model.addAttribute("erro", validationError);
                 model.addAttribute("produto", produto);
                 model.addAttribute("imagens", imagens);
-                model.addAttribute("erro", erros.toString());
                 return "product-edit-enhanced";
             }
             
-            // CORREÇÃO: Conversão do índice da imagem principal
+            // Conversão do índice da imagem principal
             Long imagemPrincipalIndex = null;
             if (imagemPrincipalStr != null && !imagemPrincipalStr.trim().isEmpty()) {
                 try {
@@ -298,19 +316,38 @@ public class ProductController {
         } catch (IOException e) {
             List<ProductImage> imagens = productService.buscarImagensProduto(id);
             model.addAttribute("erro", "Erro ao processar imagens: " + e.getMessage());
-            model.addAttribute("produto", produto);
+            model.addAttribute("produto", criarProdutoComDados(codigo, nome, descricao, preco, quantidadeEstoque, avaliacao, status));
             model.addAttribute("imagens", imagens);
             return "product-edit-enhanced";
         } catch (Exception e) {
             List<ProductImage> imagens = productService.buscarImagensProduto(id);
             model.addAttribute("erro", "Erro ao alterar produto: " + e.getMessage());
-            model.addAttribute("produto", produto);
+            model.addAttribute("produto", criarProdutoComDados(codigo, nome, descricao, preco, quantidadeEstoque, avaliacao, status));
             model.addAttribute("imagens", imagens);
             return "product-edit-enhanced";
         }
     }
+    
+    // Método auxiliar para criar produto com dados
+    private Product criarProdutoComDados(String codigo, String nome, String descricao, 
+                                        BigDecimal preco, Integer quantidadeEstoque, 
+                                        BigDecimal avaliacao, String status) {
+        Product produto = new Product();
+        produto.setCodigo(codigo);
+        produto.setNome(nome);
+        produto.setDescricao(descricao);
+        produto.setPreco(preco);
+        produto.setQuantidadeEstoque(quantidadeEstoque);
+        produto.setAvaliacao(avaliacao);
+        try {
+            produto.setStatus(Product.Status.valueOf(status));
+        } catch (IllegalArgumentException e) {
+            produto.setStatus(Product.Status.ATIVO);
+        }
+        return produto;
+    }
 
-    // Altera status do produto (ativo/inativo) - CORRIGIDO: Apenas BACKOFFICE
+    // Altera status do produto (ativo/inativo)
     @PostMapping("/status/{id}")
     public String alterarStatus(@PathVariable Long id, @RequestParam Product.Status status, 
                                HttpSession session, RedirectAttributes redirectAttributes) {
@@ -341,7 +378,6 @@ public class ProductController {
             return ResponseEntity.status(403).body("Não autorizado");
         }
         
-        // CORREÇÃO: Permite tanto BACKOFFICE quanto EXTERNO definir imagem principal
         if (usuarioLogado.getTipo() != User.TipoUsuario.BACKOFFICE && 
             usuarioLogado.getTipo() != User.TipoUsuario.EXTERNO) {
             return ResponseEntity.status(403).body("Não autorizado");
