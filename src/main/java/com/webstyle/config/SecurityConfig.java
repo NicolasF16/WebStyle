@@ -6,6 +6,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Configuração de Segurança - Sprint 3
+ * Spring Security DESABILITADO - usando autenticação manual via HttpSession
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -13,16 +17,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) 
-            .headers(headers -> headers.frameOptions().disable()) 
+            // Desabilita CSRF (necessário para formulários funcionarem)
+            .csrf(csrf -> csrf.disable())
+            
+            // Permite frames (necessário para H2 Console)
+            .headers(headers -> headers.frameOptions().disable())
+            
+            // LIBERA TODAS AS ROTAS - autenticação é feita manualmente nos controllers
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/style.css").permitAll()
-                .requestMatchers("/h2-console/**").permitAll() // Permite acesso ao H2 Console
-                .anyRequest().permitAll() 
+                .anyRequest().permitAll()
             )
-            .formLogin(form -> form.disable()) 
-            .httpBasic(basic -> basic.disable()) 
-            .logout(logout -> logout.disable()); 
+            
+            // Desabilita o formulário de login padrão do Spring Security
+            .formLogin(form -> form.disable())
+            
+            // Desabilita autenticação HTTP Basic
+            .httpBasic(basic -> basic.disable())
+            
+            // Desabilita logout padrão
+            .logout(logout -> logout.disable());
         
         return http.build();
     }

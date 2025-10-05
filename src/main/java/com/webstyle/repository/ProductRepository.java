@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,4 +24,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     @Query("SELECT p FROM Product p ORDER BY p.dataCriacao DESC")
     Page<Product> findAllOrderByDataCriacaoDesc(Pageable pageable);
+    
+    // ===== NOVO MÉTODO - Sprint 3 =====
+    /**
+     * Busca produtos por status, ordenados pela data de criação (mais recentes primeiro)
+     * Usado para listar apenas produtos ATIVOS na página pública
+     * 
+     * @param status Status do produto (ATIVO ou INATIVO)
+     * @return Lista de produtos com o status especificado
+     */
+    List<Product> findByStatusOrderByDataCriacaoDesc(Product.Status status);
 }

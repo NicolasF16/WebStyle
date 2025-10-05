@@ -17,10 +17,14 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    // Página inicial redireciona para login
+    /**
+     * ===== ATUALIZADO PARA SPRINT 3 =====
+     * Página inicial agora redireciona para /home (página pública)
+     * Antes redirecionava para /login
+     */
     @GetMapping("/")
     public String home() {
-        return "redirect:/login";
+        return "redirect:/home";
     }
 
     @GetMapping("/login")

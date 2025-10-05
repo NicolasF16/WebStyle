@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${produto.nome} + ' - WebStyle'">Produto - WebStyle</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 36px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-name {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-slogan {
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-back-home {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-back-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(107, 114, 128, 0.4);
+        }
+
+        /* ==================== CONTAINER DO PRODUTO ==================== */
+        .product-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== HEADER DO PRODUTO ==================== */
+        .product-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .product-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .product-code-header {
+            font-size: 14px;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== CONTEÚDO DO PRODUTO ==================== */
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        /* ==================== GALERIA DE IMAGENS ==================== */
+        .product-gallery {
+            position: relative;
+        }
+
+        .main-image-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .no-image {
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .no-image-icon {
+            font-size: 100px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        /* ==================== THUMBNAILS ==================== */
+        .thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .thumbnail {
+            min-width: 80px;
+            width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f5f7fa;
+            flex-shrink: 0;
+        }
+
+        .thumbnail:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .thumbnail.active {
+            border-color: #764ba2;
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ==================== DETALHES DO PRODUTO ==================== */
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .price-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .price-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .price-value {
+            font-size: 42px;
+            font-weight: 800;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 18px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stars {
+            color: #fbbf24;
+            font-size: 20px;
+        }
+
+        .rating-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .stock-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stock-number {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .stock-good { color: #10b981; }
+        .stock-medium { color: #f59e0b; }
+        .stock-low { color: #ef4444; }
+
+        .description-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .description-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .description-text {
+            line-height: 1.8;
+            color: #4b5563;
+            font-size: 16px;
+        }
+
+        /* ==================== AÇÕES ==================== */
+        .product-actions {
+            display: flex;
+            gap: 15px;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(107, 114, 128, 0.4);
+        }
+
+        /* ==================== RESPONSIVO ==================== */
+        @media (max-width: 1024px) {
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .product-header {
+                padding: 20px 25px;
+            }
+
+            .product-title {
+                font-size: 24px;
+            }
+
+            .product-content {
+                padding: 25px;
+                gap: 25px;
+            }
+
+            .main-image-container {
+                height: 350px;
+            }
+
+            .price-value {
+                font-size: 32px;
+            }
+
+            .product-actions {
+                flex-direction: column;
+                padding: 20px 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-container {
+                margin: 20px 10px;
+            }
+
+            .logo-icon {
+                font-size: 28px;
+            }
+
+            .logo-name {
+                font-size: 22px;
+            }
+
+            .main-image-container {
+                height: 280px;
+            }
+
+            .thumbnail {
+                min-width: 60px;
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/home" class="logo">
+                <div class="logo-icon">👔</div>
+                <div class="logo-text">
+                    <span class="logo-name">WebStyle</span>
+                    <span class="logo-slogan">Loja de Roupas</span>
+                </div>
+            </a>
+
+            <a href="/home" class="btn-back-home">← Voltar à Loja</a>
+        </div>
+    </header>
+
+    <!-- ==================== CONTAINER DO PRODUTO ==================== -->
+    <div class="product-container">
+        <!-- HEADER DO PRODUTO -->
+        <div class="product-header">
+            <h1 class="product-title" th:text="${produto.nome}">Nome do Produto</h1>
+            <p class="product-code-header" th:text="'Código: ' + ${produto.codigo}">Código: XXXXX</p>
+        </div>
+
+        <!-- CONTEÚDO DO PRODUTO -->
+        <div class="product-content">
+            <!-- GALERIA DE IMAGENS -->
+            <div class="product-gallery">
+                <div class="main-image-container" id="mainImageContainer">
+                    <div th:if="${imagens != null and !imagens.isEmpty()}">
+                        <img th:src="@{/{path}(path=${imagens[0].caminhoArquivo})}" 
+                             th:alt="${produto.nome}"
+                             class="main-image"
+                             id="mainImage">
+                    </div>
+                    <div th:unless="${imagens != null and !imagens.isEmpty()}" class="no-image">
+                        <div class="no-image-icon">📷</div>
+                        <p>Sem imagem disponível</p>
+                    </div>
+                </div>
+
+                <!-- THUMBNAILS -->
+                <div class="thumbnails" th:if="${imagens != null and imagens.size() > 1}">
+                    <div class="thumbnail" 
+                         th:each="imagem,iter : ${imagens}"
+                         th:classappend="${iter.index == 0} ? 'active' : ''"
+                         th:onclick="'changeMainImage(\'' + @{/{path}(path=${imagem.caminhoArquivo})} + '\', ' + ${iter.index} + ')'">
+                        <img th:src="@{/{path}(path=${imagem.caminhoArquivo})}" 
+                             th:alt="'Imagem ' + ${iter.index + 1}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETALHES DO PRODUTO -->
+            <div class="product-details">
+                <!-- PREÇO -->
+                <div class="price-box">
+                    <div class="price-label">Preço</div>
+                    <div class="price-value">
+                        R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}">0,00</span>
+                    </div>
+                </div>
+
+                <!-- INFORMAÇÕES -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Avaliação</div>
+                        <div class="info-value">
+                            <div class="rating-display">
+                                <span class="stars" 
+                                      th:utext="${#strings.repeat('⭐', produto.avaliacao.intValue())}">⭐⭐⭐</span>
+                                <span class="rating-number" th:text="${produto.avaliacao}">0.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">Disponibilidade</div>
+                        <div class="info-value">
+                            <div class="stock-display">
+                                <span class="stock-number"
+                                      th:classappend="${produto.quantidadeEstoque <= 5} ? 'stock-low' : (${produto.quantidadeEstoque <= 15} ? 'stock-medium' : 'stock-good')"
+                                      th:text="${produto.quantidadeEstoque > 0 ? produto.quantidadeEstoque + ' em estoque' : 'Esgotado'}">
+                                    0 em estoque
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DESCRIÇÃO -->
+                <div class="description-box" th:if="${produto.descricao != null and !produto.descricao.isEmpty()}">
+                    <div class="description-title">📝 Descrição do Produto</div>
+                    <p class="description-text" th:text="${produto.descricao}">
+                        Descrição do produto...
+                    </p>
+                </div>
+
+                <div class="description-box" th:unless="${produto.descricao != null and !produto.descricao.isEmpty()}">
+                    <div class="description-title">📝 Descrição do Produto</div>
+                    <p class="description-text" style="color: #9ca3af; font-style: italic;">
+                        Este produto ainda não possui uma descrição detalhada.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="product-actions">
+            <button class="btn btn-buy" disabled title="Funcionalidade em desenvolvimento">
+                🛒 Comprar (Em breve)
+            </button>
+            <a th:href="@{/home}" class="btn btn-back">
+                ← Voltar à Loja
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Função para trocar a imagem principal
+        function changeMainImage(imagePath, index) {
+            const mainImage = document.getElementById('mainImage');
+            if (mainImage) {
+                // Adiciona efeito de fade
+                mainImage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    mainImage.src = imagePath;
+                    mainImage.style.opacity = '1';
+                }, 200);
+                
+                // Atualiza o thumbnail ativo
+                const thumbnails = document.querySelectorAll('.thumbnail');
+                thumbnails.forEach((thumb, i) => {
+                    thumb.classList.toggle('active', i === index);
+                });
+            }
+        }
+
+        // Adiciona transição suave para imagem
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainImage = document.getElementById('mainImage');
+            if (mainImage) {
+                mainImage.style.transition = 'opacity 0.3s ease';
+            }
+        });
+    </script>
+</body>
+</html>

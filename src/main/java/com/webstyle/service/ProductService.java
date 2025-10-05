@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,23 +74,23 @@ public class ProductService {
     }
 
     public void alterarEstoque(Long id, Integer novaQuantidade) {
-    if (id == null) {
-        throw new RuntimeException("ID do produto é obrigatório");
+        if (id == null) {
+            throw new RuntimeException("ID do produto é obrigatório");
+        }
+        
+        if (novaQuantidade == null || novaQuantidade < 0) {
+            throw new RuntimeException("Quantidade deve ser um número não negativo");
+        }
+        
+        Optional<Product> productOpt = productRepository.findById(id);
+        if (!productOpt.isPresent()) {
+            throw new RuntimeException("Produto não encontrado com ID: " + id);
+        }
+        
+        Product produto = productOpt.get();
+        produto.setQuantidadeEstoque(novaQuantidade);
+        productRepository.save(produto);
     }
-    
-    if (novaQuantidade == null || novaQuantidade < 0) {
-        throw new RuntimeException("Quantidade deve ser um número não negativo");
-    }
-    
-    Optional<Product> productOpt = productRepository.findById(id);
-    if (!productOpt.isPresent()) {
-        throw new RuntimeException("Produto não encontrado com ID: " + id);
-    }
-    
-    Product produto = productOpt.get();
-    produto.setQuantidadeEstoque(novaQuantidade);
-    productRepository.save(produto);
-}
 
     // CORREÇÃO: Validação mais robusta dos dados do produto
     private void validarDadosProduto(Product produto) {
@@ -406,5 +407,16 @@ public class ProductService {
         } else {
             throw new RuntimeException("Produto não encontrado com ID: " + id);
         }
+    }
+
+    // ===== NOVO MÉTODO - Sprint 3 =====
+    /**
+     * Lista apenas produtos ATIVOS para exibição pública (Sprint 3)
+     * Usado na página home.html
+     * 
+     * @return Lista de produtos com status ATIVO, ordenados por data de criação (mais recentes primeiro)
+     */
+    public List<Product> listarProdutosAtivos() {
+        return productRepository.findByStatusOrderByDataCriacaoDesc(Product.Status.ATIVO);
     }
 }
