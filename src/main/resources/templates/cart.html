@@ -598,6 +598,17 @@
             to { transform: rotate(360deg); }
         }
 
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+
         /* RESPONSIVO */
         @media (max-width: 1024px) {
             .cart-grid {
@@ -803,6 +814,7 @@
         const subtotalOriginal = /*[[${cartTotal}]]*/ 0;
         let freteSelecionado = null;
         let cepConsultado = null;
+        let opcoesFreteGlobal = [];
         /*]]>*/
 
         // Formata CEP enquanto digita
@@ -880,6 +892,9 @@
 
         // Exibe opções de frete
         function exibirOpcoesFlrete(opcoes) {
+            // IMPORTANTE: Armazena as opções globalmente
+            opcoesFreteGlobal = opcoes;
+            
             const container = document.getElementById('shippingOptions');
             
             let html = '<div class="shipping-title" style="margin-top: 15px;">Escolha o frete:</div>';
@@ -911,11 +926,20 @@
             container.style.display = 'block';
         }
         
-        // Armazena opções de frete globalmente
-        let opcoesFreteGlobal = [];
+        // Seleciona frete por índice (NOVA FUNÇÃO)
+        function selecionarFreteByIndex(index) {
+            const opcao = opcoesFreteGlobal[index];
+            if (!opcao) {
+                console.error('Opção de frete não encontrada:', index);
+                return;
+            }
+            selecionarFrete(opcao);
+        }
 
         // Seleciona frete
         function selecionarFrete(opcao) {
+            console.log('Selecionando frete:', opcao);
+            
             fetch('/frete/selecionar', {
                 method: 'POST',
                 headers: {
@@ -925,6 +949,8 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Resposta do servidor:', data);
+                
                 if (data.success) {
                     freteSelecionado = opcao;
                     
@@ -932,7 +958,12 @@
                     document.querySelectorAll('.shipping-option').forEach(el => {
                         el.classList.remove('selected');
                     });
-                    event.currentTarget.classList.add('selected');
+                    
+                    // Seleciona a opção clicada
+                    const opcaoElement = document.querySelector(`.shipping-option[data-index="${opcoesFreteGlobal.indexOf(opcao)}"]`);
+                    if (opcaoElement) {
+                        opcaoElement.classList.add('selected');
+                    }
                     
                     // Atualiza resumo
                     atualizarResumo(data.valorFrete, data.valorTotal);
@@ -1035,18 +1066,5 @@
             }
         });
     </script>
-
-    <style>
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-        }
-    </style>
 </body>
 </html>
