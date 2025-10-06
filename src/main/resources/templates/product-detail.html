@@ -85,6 +85,34 @@
             box-shadow: 0 6px 25px rgba(107, 114, 128, 0.4);
         }
 
+        /* ==================== ALERTAS ==================== */
+        .alert {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
         /* ==================== CONTAINER DO PRODUTO ==================== */
         .product-container {
             max-width: 1200px;
@@ -97,14 +125,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ==================== HEADER DO PRODUTO ==================== */
@@ -319,6 +341,63 @@
             font-size: 16px;
         }
 
+        /* ==================== QUANTIDADE ==================== */
+        .quantity-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .quantity-label {
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quantity-input {
+            width: 80px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            color: #1f2937;
+        }
+
         /* ==================== AÇÕES ==================== */
         .product-actions {
             display: flex;
@@ -350,6 +429,14 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-buy:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-buy:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
@@ -450,6 +537,10 @@
         </div>
     </header>
 
+    <!-- MENSAGENS -->
+    <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+    <div th:if="${erro}" class="alert alert-error" th:text="${erro}"></div>
+
     <!-- ==================== CONTAINER DO PRODUTO ==================== -->
     <div class="product-container">
         <!-- HEADER DO PRODUTO -->
@@ -524,6 +615,25 @@
                     </div>
                 </div>
 
+                <!-- SELETOR DE QUANTIDADE -->
+                <div class="quantity-selector" th:if="${produto.quantidadeEstoque > 0}">
+                    <div class="quantity-label">Quantidade</div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="decrementQuantity()" id="btnDecrement">−</button>
+                        <input type="number" 
+                               id="quantityInput" 
+                               class="quantity-input" 
+                               value="1" 
+                               min="1" 
+                               th:max="${produto.quantidadeEstoque}"
+                               readonly>
+                        <button class="quantity-btn" onclick="incrementQuantity()" id="btnIncrement">+</button>
+                        <span style="font-size: 14px; color: #6b7280;">
+                            (Máx: <span th:text="${produto.quantidadeEstoque}">0</span>)
+                        </span>
+                    </div>
+                </div>
+
                 <!-- DESCRIÇÃO -->
                 <div class="description-box" th:if="${produto.descricao != null and !produto.descricao.isEmpty()}">
                     <div class="description-title">📝 Descrição do Produto</div>
@@ -543,8 +653,11 @@
 
         <!-- AÇÕES -->
         <div class="product-actions">
-            <button class="btn btn-buy" disabled title="Funcionalidade em desenvolvimento">
-                🛒 Comprar (Em breve)
+            <button class="btn btn-buy" 
+                    id="btnComprar"
+                    th:disabled="${produto.quantidadeEstoque <= 0}"
+                    onclick="comprarProduto()">
+                🛒 <span th:text="${produto.quantidadeEstoque > 0 ? 'Adicionar ao Carrinho' : 'Produto Esgotado'}">Adicionar ao Carrinho</span>
             </button>
             <a th:href="@{/home}" class="btn btn-back">
                 ← Voltar à Loja
@@ -552,7 +665,12 @@
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const produtoId = /*[[${produto.id}]]*/ 0;
+        const estoqueMaximo = /*[[${produto.quantidadeEstoque}]]*/ 0;
+        /*]]>*/
+
         // Função para trocar a imagem principal
         function changeMainImage(imagePath, index) {
             const mainImage = document.getElementById('mainImage');
@@ -573,6 +691,119 @@
             }
         }
 
+        // Controles de quantidade
+        function incrementQuantity() {
+            const input = document.getElementById('quantityInput');
+            let value = parseInt(input.value);
+            if (value < estoqueMaximo) {
+                input.value = value + 1;
+            }
+        }
+
+        function decrementQuantity() {
+            const input = document.getElementById('quantityInput');
+            let value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        }
+
+        // Função para comprar produto
+        function comprarProduto() {
+            const quantidade = parseInt(document.getElementById('quantityInput').value);
+            const btn = document.getElementById('btnComprar');
+            
+            // Desabilita o botão temporariamente
+            btn.disabled = true;
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '⏳ Adicionando...';
+            
+            // Envia requisição para adicionar ao carrinho
+            fetch('/carrinho/adicionar-ajax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'produtoId=' + produtoId + '&quantidade=' + quantidade
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Sucesso
+                    btn.innerHTML = '✅ Adicionado ao Carrinho!';
+                    btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    
+                    // Mostra notificação
+                    mostrarNotificacao(data.message, 'success');
+                    
+                    // Opção: redirecionar para o carrinho após 2 segundos
+                    setTimeout(() => {
+                        if (confirm('Produto adicionado! Deseja ir para o carrinho?')) {
+                            window.location.href = '/carrinho';
+                        } else {
+                            // Restaura o botão
+                            btn.innerHTML = textoOriginal;
+                            btn.disabled = false;
+                            btn.style.background = '';
+                            // Reseta a quantidade
+                            document.getElementById('quantityInput').value = 1;
+                        }
+                    }, 1000);
+                } else {
+                    // Erro
+                    btn.innerHTML = '❌ Erro';
+                    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                    
+                    mostrarNotificacao(data.message, 'error');
+                    
+                    // Restaura o botão após 3 segundos
+                    setTimeout(() => {
+                        btn.innerHTML = textoOriginal;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                btn.innerHTML = '❌ Erro';
+                btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                
+                mostrarNotificacao('Erro ao adicionar produto ao carrinho', 'error');
+                
+                setTimeout(() => {
+                    btn.innerHTML = textoOriginal;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3000);
+            });
+        }
+
+        // Mostra notificação temporária
+        function mostrarNotificacao(mensagem, tipo) {
+            const notificacao = document.createElement('div');
+            notificacao.className = 'alert alert-' + tipo;
+            notificacao.textContent = mensagem;
+            notificacao.style.position = 'fixed';
+            notificacao.style.top = '100px';
+            notificacao.style.left = '50%';
+            notificacao.style.transform = 'translateX(-50%)';
+            notificacao.style.zIndex = '9999';
+            notificacao.style.minWidth = '300px';
+            
+            document.body.appendChild(notificacao);
+            
+            // Remove após 3 segundos
+            setTimeout(() => {
+                notificacao.style.animation = 'fadeOut 0.5s ease-out';
+                setTimeout(() => {
+                    if (document.body.contains(notificacao)) {
+                        document.body.removeChild(notificacao);
+                    }
+                }, 500);
+            }, 3000);
+        }
+
         // Adiciona transição suave para imagem
         document.addEventListener('DOMContentLoaded', function() {
             const mainImage = document.getElementById('mainImage');
@@ -581,5 +812,18 @@
             }
         });
     </script>
+
+    <style>
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+    </style>
 </body>
 </html>
