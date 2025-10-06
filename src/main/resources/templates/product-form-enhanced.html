@@ -271,6 +271,17 @@
             border-color: #dc3545 !important;
         }
 
+        .status-info {
+            background: #e8f4fd;
+            border: 1px solid #0074d9;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #0074d9;
+        }
+
         @media (max-width: 768px) {
             .form-container {
                 margin: 10px;
@@ -301,6 +312,7 @@
         <div th:if="${erro}" class="error-message" th:text="${erro}"></div>
         <div th:if="${sucesso}" class="success-message" th:text="${sucesso}"></div>
         
+        
         <form th:action="@{/produtos/cadastro}" method="post" enctype="multipart/form-data" id="produtoForm">
             
             <!-- Dados básicos do produto -->
@@ -316,11 +328,12 @@
                 <div class="form-col">
                     <div class="form-group">
                         <label for="status" class="required">Status</label>
-                        <select id="status" name="status" required>
-                            <option value="">Selecione o status</option>
-                            <option value="ATIVO" th:selected="${produto != null && produto.status != null && produto.status.name() == 'ATIVO'}">Ativo</option>
-                            <option value="INATIVO" th:selected="${produto != null && produto.status != null && produto.status.name() == 'INATIVO'}">Inativo</option>
+                        <select id="status" name="status" required disabled>
+                            <option value="ATIVO" selected>Ativo</option>
                         </select>
+                        <small>Produtos são cadastrados automaticamente como ativos</small>
+                        <!-- Campo hidden para enviar o valor ATIVO -->
+                        <input type="hidden" name="status" value="ATIVO">
                     </div>
                 </div>
             </div>
@@ -604,13 +617,6 @@
             const avaliacao = document.getElementById('avaliacao');
             if (!avaliacao.value) {
                 showFieldError(avaliacao, 'Avaliação é obrigatória');
-                hasErrors = true;
-            }
-            
-            // Validação do status
-            const status = document.getElementById('status');
-            if (!status.value) {
-                showFieldError(status, 'Status é obrigatório');
                 hasErrors = true;
             }
             

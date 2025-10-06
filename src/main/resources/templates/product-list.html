@@ -3,131 +3,85 @@
 <head>
     <title>Lista de Produtos</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/style.css">
-</head>
-<body>
-    <h2>Lista de Produtos</h2>
-    
-    <div class="actions">
-        <a th:href="@{/produtos/novo}" class="add-btn">+ Cadastrar Novo Produto</a>
-        <a th:href="@{/main}">← Voltar ao Menu Principal</a>
-    </div>
-    
-    <!-- Campo de busca -->
-    <div class="search-container">
-        <form th:action="@{/produtos}" method="get" class="search-form">
-            <input type="text" name="busca" th:value="${busca}" placeholder="Buscar por nome ou código..." class="search-input">
-            <button type="submit" class="search-btn">Buscar</button>
-            <a th:href="@{/produtos}" class="clear-btn">Limpar</a>
-        </form>
-    </div>
-    
-    <!-- Informações da listagem -->
-    <div class="info-container" th:if="${totalElementos > 0}">
-        <p>Exibindo produtos <span th:text="${paginaAtual * 10 + 1}"></span> a 
-           <span th:text="${(paginaAtual + 1) * 10 > totalElementos ? totalElementos : (paginaAtual + 1) * 10}"></span> 
-           de <span th:text="${totalElementos}"></span> produtos encontrados</p>
-        <p th:if="${busca}" class="search-info">Resultados para: "<span th:text="${busca}"></span>"</p>
-    </div>
-    
-    <table th:if="${totalElementos > 0}">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Quantidade</th>
-                <th>Valor (R$)</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="produto : ${produtos.content}">
-                <td th:text="${produto.codigo}"></td>
-                <td th:text="${produto.nome}"></td>
-                <td th:text="${produto.quantidadeEstoque}"></td>
-                <td th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}"></td>
-                <td>
-                    <span th:class="${produto.status == 'ATIVO' ? 'status-ativo' : 'status-inativo'}" 
-                          th:text="${produto.status}"></span>
-                </td>
-                <td class="actions-cell">
-                    <!-- Visualizar -->
-                    <a th:href="@{'/produtos/visualizar/' + ${produto.id}}" class="action-btn view-btn" title="Visualizar">
-                        👁️
-                    </a>
-                    
-                    <!-- Editar -->
-                    <a th:href="@{'/produtos/editar/' + ${produto.id}}" class="action-btn edit-btn" title="Editar">
-                        ✏️
-                    </a>
-                    
-                    <!-- Alterar Status -->
-                    <form th:action="@{'/produtos/status/' + ${produto.id}}" method="post" style="display:inline;">
-                        <input type="hidden" name="status" th:value="${produto.status == 'ATIVO' ? 'INATIVO' : 'ATIVO'}">
-                        <button type="submit" 
-                                th:class="${produto.status == 'ATIVO' ? 'action-btn deactivate-btn' : 'action-btn activate-btn'}"
-                                th:title="${produto.status == 'ATIVO' ? 'Inativar' : 'Reativar'}"
-                                onclick="return confirm('Confirma a alteração de status?')">
-                            <span th:if="${produto.status == 'ATIVO'}">🚫</span>
-                            <span th:if="${produto.status == 'INATIVO'}">✅</span>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <!-- Paginação -->
-    <div class="pagination" th:if="${totalPaginas > 1}">
-        <!-- Primeira página -->
-        <a th:if="${paginaAtual > 0}" 
-           th:href="@{/produtos(pagina=0, busca=${busca})}" 
-           class="page-btn">« Primeira</a>
-        
-        <!-- Página anterior -->
-        <a th:if="${paginaAtual > 0}" 
-           th:href="@{/produtos(pagina=${paginaAtual - 1}, busca=${busca})}" 
-           class="page-btn">‹ Anterior</a>
-        
-        <!-- Páginas numeradas -->
-        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}" 
-              th:if="${i >= paginaAtual - 2 && i <= paginaAtual + 2}">
-            <a th:if="${i != paginaAtual}" 
-               th:href="@{/produtos(pagina=${i}, busca=${busca})}" 
-               class="page-btn" th:text="${i + 1}"></a>
-            <span th:if="${i == paginaAtual}" 
-                  class="page-btn current" th:text="${i + 1}"></span>
-        </span>
-        
-        <!-- Próxima página -->
-        <a th:if="${paginaAtual < totalPaginas - 1}" 
-           th:href="@{/produtos(pagina=${paginaAtual + 1}, busca=${busca})}" 
-           class="page-btn">Próxima ›</a>
-        
-        <!-- Última página -->
-        <a th:if="${paginaAtual < totalPaginas - 1}" 
-           th:href="@{/produtos(pagina=${totalPaginas - 1}, busca=${busca})}" 
-           class="page-btn">Última »</a>
-    </div>
-    
-    <!-- Caso não haja produtos -->
-    <div th:if="${totalElementos == 0}" class="no-products">
-        <p th:if="${busca}">Nenhum produto encontrado para a busca: "<span th:text="${busca}"></span>"</p>
-        <p th:unless="${busca}">Nenhum produto cadastrado no sistema.</p>
-    </div>
-
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #0074d9;
+            font-size: 28px;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 3px solid #0074d9;
+            padding-bottom: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .btn-header {
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-new:hover {
+            background: #218838;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+        }
+
         .search-container {
-            background: #fff;
-            border: 1px solid #0074d9;
+            background: #f8f9fa;
+            border: 2px solid #0074d9;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-            text-align: center;
+            margin-bottom: 20px;
         }
-        
+
         .search-form {
             display: flex;
             gap: 10px;
@@ -135,208 +89,515 @@
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .search-input {
             flex: 1;
             min-width: 250px;
-            padding: 8px 12px;
+            padding: 10px 15px;
             border: 1px solid #0074d9;
             border-radius: 4px;
             font-size: 14px;
         }
-        
+
+        .search-input:focus {
+            outline: none;
+            border-color: #005fa3;
+            box-shadow: 0 0 5px rgba(0, 116, 217, 0.3);
+        }
+
         .search-btn, .clear-btn {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
             font-weight: bold;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            font-size: 14px;
         }
-        
+
         .search-btn {
             background: #0074d9;
-            color: #fff;
+            color: white;
         }
-        
+
         .search-btn:hover {
             background: #005fa3;
         }
-        
+
         .clear-btn {
             background: #f8f9fa;
             color: #0074d9;
             border: 1px solid #0074d9;
         }
-        
+
         .clear-btn:hover {
             background: #e9ecef;
         }
-        
+
         .info-container {
             text-align: center;
             margin: 20px 0;
             background: #f8f9fa;
-            padding: 10px;
+            padding: 12px;
             border-radius: 4px;
+            border: 1px solid #dee2e6;
         }
-        
+
+        .info-container p {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
         .search-info {
             font-weight: bold;
             color: #0074d9;
         }
-        
-        .add-btn {
-            background: #28a745 !important;
-            color: #fff;
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: #0074d9;
+        }
+
+        thead th {
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
             font-weight: bold;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 12px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .status-badge {
             display: inline-block;
-            margin: 0 8px;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
         }
-        
-        .add-btn:hover {
-            background: #218838 !important;
-        }
-        
+
         .status-ativo {
             background: #28a745;
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
+            color: white;
         }
-        
+
         .status-inativo {
             background: #dc3545;
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
+            color: white;
         }
-        
+
         .actions-cell {
             white-space: nowrap;
+            text-align: center;
         }
-        
-        .action-btn {
+
+        .status-form {
             display: inline-block;
-            padding: 6px 8px;
-            margin: 0 2px;
+            margin: 0;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            margin: 2px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
             transition: all 0.2s;
+            vertical-align: middle;
         }
-        
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .btn-text {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .view-btn {
             background: #17a2b8;
-            color: #fff;
+            color: white;
         }
-        
+
         .view-btn:hover {
             background: #138496;
         }
-        
+
         .edit-btn {
             background: #ffc107;
             color: #000;
         }
-        
+
         .edit-btn:hover {
             background: #e0a800;
         }
-        
+
         .activate-btn {
             background: #28a745;
-            color: #fff;
+            color: white;
         }
-        
+
         .activate-btn:hover {
             background: #218838;
         }
-        
+
         .deactivate-btn {
             background: #dc3545;
-            color: #fff;
+            color: white;
         }
-        
+
         .deactivate-btn:hover {
             background: #c82333;
         }
-        
+
         .pagination {
             text-align: center;
             margin: 30px 0;
             padding: 20px;
         }
-        
+
         .page-btn {
             display: inline-block;
             padding: 8px 12px;
             margin: 0 4px;
-            background: #fff;
+            background: white;
             border: 1px solid #0074d9;
             color: #0074d9;
             text-decoration: none;
             border-radius: 4px;
             font-weight: bold;
             transition: all 0.2s;
+            font-size: 14px;
         }
-        
+
         .page-btn:hover {
             background: #0074d9;
-            color: #fff;
+            color: white;
         }
-        
+
         .page-btn.current {
             background: #0074d9;
-            color: #fff;
+            color: white;
             cursor: default;
         }
-        
+
         .no-products {
             text-align: center;
             margin: 40px;
             padding: 40px;
-            background: #fff;
+            background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e9ecef;
+            border: 2px dashed #dee2e6;
         }
-        
+
+        .no-products-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .no-products h3 {
+            color: #0074d9;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
         .no-products p {
-            font-size: 16px;
-            color: #666;
+            font-size: 14px;
+            color: #6c757d;
         }
-        
+
+        @media (max-width: 1024px) {
+            .page-container {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            thead th, tbody td {
+                padding: 10px 8px;
+            }
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .page-container {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
             .search-form {
                 flex-direction: column;
             }
-            
+
             .search-input {
                 min-width: 100%;
             }
-            
-            .actions-cell .action-btn {
-                display: block;
-                margin: 2px 0;
+
+            .table-container {
+                overflow-x: auto;
             }
-            
+
+            table {
+                min-width: 800px;
+            }
+
+            .actions-cell {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                align-items: stretch;
+            }
+
+            .actions-cell .action-btn,
+            .actions-cell .status-form {
+                width: 100%;
+            }
+
+            .actions-cell .action-btn {
+                justify-content: center;
+            }
+
             .pagination .page-btn {
-                padding: 6px 8px;
-                margin: 0 2px;
+                padding: 6px 10px;
+                margin: 2px;
                 font-size: 12px;
             }
         }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            .btn-header {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .no-products {
+                padding: 30px 15px;
+            }
+
+            .no-products-icon {
+                font-size: 50px;
+            }
+        }
     </style>
+</head>
+<body>
+    <div class="page-container">
+        <h2>Lista de Produtos</h2>
+        
+        <div class="header-actions">
+            <a th:href="@{/produtos/novo}" class="btn-header btn-new">
+                <span>+</span>
+                <span>Cadastrar Novo Produto</span>
+            </a>
+            <a th:href="@{/main}" class="btn-header btn-back">
+                <span>←</span>
+                <span>Voltar ao Menu Principal</span>
+            </a>
+        </div>
+        
+        <div class="search-container">
+            <form th:action="@{/produtos}" method="get" class="search-form">
+                <input type="text" 
+                       name="busca" 
+                       th:value="${busca}" 
+                       placeholder="Buscar por nome ou código..." 
+                       class="search-input">
+                <button type="submit" class="search-btn">Buscar</button>
+                <a th:href="@{/produtos}" class="clear-btn">Limpar</a>
+            </form>
+        </div>
+        
+        <div class="info-container" th:if="${totalElementos > 0}">
+            <p>Exibindo produtos <strong th:text="${paginaAtual * 10 + 1}"></strong> a 
+               <strong th:text="${(paginaAtual + 1) * 10 > totalElementos ? totalElementos : (paginaAtual + 1) * 10}"></strong> 
+               de <strong th:text="${totalElementos}"></strong> produtos encontrados</p>
+            <p th:if="${busca}" class="search-info">Resultados para: "<span th:text="${busca}"></span>"</p>
+        </div>
+        
+        <div class="table-container" th:if="${totalElementos > 0}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Quantidade</th>
+                        <th>Valor (R$)</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="produto : ${produtos.content}">
+                        <td th:text="${produto.codigo}"></td>
+                        <td th:text="${produto.nome}"></td>
+                        <td th:text="${produto.quantidadeEstoque}"></td>
+                        <td th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}"></td>
+                        <td>
+                            <span th:class="${produto.status.toString() == 'ATIVO' ? 'status-badge status-ativo' : 'status-badge status-inativo'}" 
+                                  th:text="${produto.status}"></span>
+                        </td>
+                        <td class="actions-cell">
+                            <!-- Botão Visualizar - Apenas para ADMINISTRADOR -->
+                            <a th:if="${session.usuarioLogado.tipo.toString() == 'BACKOFFICE'}"
+                               th:href="@{'/produtos/visualizar/' + ${produto.id}}" 
+                               class="action-btn view-btn" 
+                               title="Visualizar Produto">
+                                <span class="btn-icon">👁️</span>
+                                <span class="btn-text">Ver</span>
+                            </a>
+                            
+                            <!-- Botão Editar - Todos podem editar -->
+                            <a th:href="@{'/produtos/editar/' + ${produto.id}}" 
+                               class="action-btn edit-btn" 
+                               title="Editar Produto">
+                                <span class="btn-icon">✏️</span>
+                                <span class="btn-text">Editar</span>
+                            </a>
+                            
+                            <!-- Botão Ativar/Desativar - Apenas para ADMINISTRADOR -->
+                            <form th:if="${session.usuarioLogado.tipo.toString() == 'BACKOFFICE'}"
+                                  th:action="@{'/produtos/status/' + ${produto.id}}" 
+                                  method="post" 
+                                  class="status-form">
+                                <input type="hidden" name="status" th:value="${produto.status.toString() == 'ATIVO' ? 'INATIVO' : 'ATIVO'}">
+                                <button type="submit" 
+                                        th:class="${produto.status.toString() == 'ATIVO' ? 'action-btn deactivate-btn' : 'action-btn activate-btn'}"
+                                        th:title="${produto.status.toString() == 'ATIVO' ? 'Inativar Produto' : 'Reativar Produto'}"
+                                        th:attr="data-status=${produto.status},data-nome=${produto.nome}"
+                                        onclick="return confirmarAlteracaoStatus(event, this)">
+                                    <span class="btn-icon" th:if="${produto.status.toString() == 'ATIVO'}">🚫</span>
+                                    <span class="btn-icon" th:if="${produto.status.toString() == 'INATIVO'}">✅</span>
+                                    <span class="btn-text" th:if="${produto.status.toString() == 'ATIVO'}">Desativar</span>
+                                    <span class="btn-text" th:if="${produto.status.toString() == 'INATIVO'}">Ativar</span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination" th:if="${totalPaginas > 1}">
+            <a th:if="${paginaAtual > 0}" 
+               th:href="@{/produtos(pagina=0, busca=${busca})}" 
+               class="page-btn">« Primeira</a>
+            
+            <a th:if="${paginaAtual > 0}" 
+               th:href="@{/produtos(pagina=${paginaAtual - 1}, busca=${busca})}" 
+               class="page-btn">‹ Anterior</a>
+            
+            <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}" 
+                  th:if="${i >= paginaAtual - 2 && i <= paginaAtual + 2}">
+                <a th:if="${i != paginaAtual}" 
+                   th:href="@{/produtos(pagina=${i}, busca=${busca})}" 
+                   class="page-btn" th:text="${i + 1}"></a>
+                <span th:if="${i == paginaAtual}" 
+                      class="page-btn current" th:text="${i + 1}"></span>
+            </span>
+            
+            <a th:if="${paginaAtual < totalPaginas - 1}" 
+               th:href="@{/produtos(pagina=${paginaAtual + 1}, busca=${busca})}" 
+               class="page-btn">Próxima ›</a>
+            
+            <a th:if="${paginaAtual < totalPaginas - 1}" 
+               th:href="@{/produtos(pagina=${totalPaginas - 1}, busca=${busca})}" 
+               class="page-btn">Última »</a>
+        </div>
+        
+        <div th:if="${totalElementos == 0}" class="no-products">
+            <div class="no-products-icon">🛍️</div>
+            <h3 th:if="${busca}">Nenhum produto encontrado</h3>
+            <h3 th:unless="${busca}">Nenhum produto cadastrado</h3>
+            <p th:if="${busca}">Não encontramos produtos para a busca: "<strong th:text="${busca}"></strong>"</p>
+            <p th:unless="${busca}">Comece cadastrando seu primeiro produto no sistema.</p>
+        </div>
+    </div>
+
+    <script>
+        function confirmarAlteracaoStatus(event, button) {
+            event.preventDefault();
+            
+            const status = button.getAttribute('data-status');
+            const nomeProduto = button.getAttribute('data-nome');
+            const acao = status === 'ATIVO' ? 'desativar' : 'ativar';
+            
+            const mensagem = `Tem certeza que deseja ${acao} o produto?\n\n` +
+                           `Produto: ${nomeProduto}\n\n` +
+                           `${status === 'ATIVO' ? 
+                             '⚠️ O produto ficará oculto na loja até ser reativado.' : 
+                             '✅ O produto voltará a aparecer na loja.'}`;
+            
+            if (confirm(mensagem)) {
+                button.closest('form').submit();
+            }
+            
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        });
+    </script>
 </body>
 </html>
