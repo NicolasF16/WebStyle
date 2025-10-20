@@ -126,6 +126,121 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
+        /* ==================== USER MENU DROPDOWN ==================== */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .user-menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .user-icon {
+            font-size: 20px;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+
+        .user-menu.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .user-menu.active .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-user-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .dropdown-user-email {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .dropdown-menu li {
+            margin: 0;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #374151;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f3f4f6;
+            padding-left: 25px;
+        }
+
+        .dropdown-menu-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 10px 0;
+        }
+
         .auth-link {
             display: flex;
             align-items: center;
@@ -150,14 +265,13 @@
             font-size: 20px;
         }
 
-        /* ==================== CONTAINER PRINCIPAL ==================== */
+        /* Resto dos estilos permanecem iguais... */
         .main-container {
             max-width: 1400px;
             margin: 40px auto;
             padding: 0 30px;
         }
 
-        /* ==================== TÍTULO DA PÁGINA ==================== */
         .page-title {
             text-align: center;
             color: white;
@@ -188,7 +302,6 @@
             opacity: 0.9;
         }
 
-        /* ==================== MENSAGENS ==================== */
         .alert {
             max-width: 600px;
             margin: 0 auto 30px;
@@ -222,7 +335,6 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
-        /* ==================== GRID DE CARDS ==================== */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -230,7 +342,6 @@
             margin-bottom: 60px;
         }
 
-        /* ==================== CARD DO PRODUTO ==================== */
         .product-card {
             background: white;
             border-radius: 20px;
@@ -265,7 +376,6 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
         }
 
-        /* ==================== IMAGEM DO PRODUTO ==================== */
         .product-image {
             width: 100%;
             height: 300px;
@@ -298,7 +408,6 @@
             opacity: 0.5;
         }
 
-        /* ==================== BADGE DE AVALIAÇÃO ==================== */
         .rating-badge {
             position: absolute;
             top: 15px;
@@ -319,7 +428,6 @@
             color: #fbbf24;
         }
 
-        /* ==================== CONTEÚDO DO CARD ==================== */
         .product-info {
             padding: 25px;
         }
@@ -355,7 +463,6 @@
             margin-bottom: 20px;
         }
 
-        /* ==================== BOTÕES ==================== */
         .product-actions {
             display: flex;
             gap: 10px;
@@ -399,7 +506,6 @@
             box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
         }
 
-        /* ==================== MENSAGEM SEM PRODUTOS ==================== */
         .no-products {
             text-align: center;
             padding: 100px 20px;
@@ -422,7 +528,6 @@
             opacity: 0.8;
         }
 
-        /* ==================== FOOTER ==================== */
         .footer {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -453,7 +558,6 @@
             text-decoration: underline;
         }
 
-        /* ==================== RESPONSIVO ==================== */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -490,6 +594,16 @@
             .product-actions {
                 flex-direction: column;
             }
+            
+            .user-dropdown {
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            
+            .user-menu.active .user-dropdown {
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         @media (max-width: 480px) {
@@ -505,7 +619,7 @@
                 font-size: 24px;
             }
 
-            .auth-link, .cart-btn {
+            .auth-link, .cart-btn, .user-menu-btn {
                 padding: 10px 20px;
                 font-size: 14px;
             }
@@ -515,9 +629,24 @@
                 width: 100%;
             }
 
-            .header-actions a {
+            .header-actions a, .header-actions .user-menu {
+                width: 100%;
+            }
+            
+            .user-menu-btn {
                 width: 100%;
                 justify-content: center;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
             }
         }
     </style>
@@ -543,8 +672,51 @@
                     <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
                 </a>
 
-                <!-- LINK FAÇA LOGIN / CRIE SEU LOGIN - ATUALIZADO PARA /cliente/login -->
-                <a href="/cliente/login" class="auth-link">
+                <!-- SE ESTIVER LOGADO: Menu do Usuário -->
+                <div th:if="${session.clienteLogado != null}" class="user-menu" id="userMenu">
+                    <button class="user-menu-btn" onclick="toggleUserMenu()">
+                        <span class="user-icon">👤</span>
+                        <span th:text="'Olá, ' + ${session.clienteLogado.nomeCompleto.split(' ')[0]}">Olá, Nome</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    
+                    <div class="user-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-user-name" th:text="${session.clienteLogado.nomeCompleto}">Nome Completo</div>
+                            <div class="dropdown-user-email" th:text="${session.clienteLogado.email}">email@exemplo.com</div>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/cliente/perfil">
+                                    <span class="dropdown-menu-icon">👤</span>
+                                    <span>Meu Perfil</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/carrinho">
+                                    <span class="dropdown-menu-icon">🛒</span>
+                                    <span>Meu Carrinho</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="alert('Funcionalidade em desenvolvimento'); return false;">
+                                    <span class="dropdown-menu-icon">📦</span>
+                                    <span>Meus Pedidos</span>
+                                </a>
+                            </li>
+                            <li><div class="dropdown-divider"></div></li>
+                            <li>
+                                <a href="/cliente/logout" style="color: #ef4444;">
+                                    <span class="dropdown-menu-icon">🚪</span>
+                                    <span>Sair</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- SE NÃO ESTIVER LOGADO: Link de Login -->
+                <a th:unless="${session.clienteLogado != null}" href="/cliente/login" class="auth-link">
                     <span class="auth-icon">👤</span>
                     <span>Faça Login / Crie seu Login</span>
                 </a>
@@ -587,25 +759,17 @@
 
                 <!-- INFORMAÇÕES DO PRODUTO -->
                 <div class="product-info">
-                    <!-- NOME DO PRODUTO -->
                     <h2 class="product-name" th:text="${produto.nome}">Nome do Produto</h2>
-                    
-                    <!-- CÓDIGO DO PRODUTO -->
                     <div class="product-code" th:text="'Cód: ' + ${produto.codigo}">Cód: XXXXX</div>
-                    
-                    <!-- PREÇO -->
                     <div class="product-price">
                         R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}">0,00</span>
                     </div>
                     
                     <!-- BOTÕES -->
                     <div class="product-actions">
-                        <!-- BOTÃO VER DETALHES -->
                         <a th:href="@{/produto/{id}(id=${produto.id})}" class="btn btn-details">
                             🔍 Detalhes
                         </a>
-                        
-                        <!-- BOTÃO ADICIONAR AO CARRINHO -->
                         <button class="btn btn-cart" 
                                 th:data-produto-id="${produto.id}"
                                 onclick="adicionarAoCarrinho(this)">
@@ -639,21 +803,31 @@
     </footer>
 
     <script>
+        // Toggle do menu do usuário
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            userMenu.classList.toggle('active');
+        }
+
+        // Fecha o menu ao clicar fora
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu && !userMenu.contains(event.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+
         // Atualiza o badge do carrinho ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
             atualizarBadgeCarrinho();
         });
 
-        // Função para adicionar produto ao carrinho
         function adicionarAoCarrinho(button) {
             const produtoId = button.getAttribute('data-produto-id');
-            
-            // Desabilita o botão temporariamente
             button.disabled = true;
             const textoOriginal = button.innerHTML;
             button.innerHTML = '⏳ Adicionando...';
             
-            // Envia requisição AJAX
             fetch('/carrinho/adicionar-ajax', {
                 method: 'POST',
                 headers: {
@@ -664,29 +838,18 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Sucesso - mostra feedback visual
                     button.innerHTML = '✅ Adicionado!';
                     button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                    
-                    // Atualiza o badge do carrinho
                     atualizarBadgeCarrinho(data.cartItemCount);
-                    
-                    // Mostra notificação
                     mostrarNotificacao(data.message, 'success');
-                    
-                    // Restaura o botão após 2 segundos
                     setTimeout(() => {
                         button.innerHTML = textoOriginal;
                         button.disabled = false;
                     }, 2000);
                 } else {
-                    // Erro
                     button.innerHTML = '❌ Erro';
                     button.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-                    
                     mostrarNotificacao(data.message, 'error');
-                    
-                    // Restaura o botão após 3 segundos
                     setTimeout(() => {
                         button.innerHTML = textoOriginal;
                         button.style.background = '';
@@ -698,9 +861,7 @@
                 console.error('Erro:', error);
                 button.innerHTML = '❌ Erro';
                 button.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-                
                 mostrarNotificacao('Erro ao adicionar produto ao carrinho', 'error');
-                
                 setTimeout(() => {
                     button.innerHTML = textoOriginal;
                     button.style.background = '';
@@ -709,10 +870,8 @@
             });
         }
 
-        // Atualiza o badge do carrinho
         function atualizarBadgeCarrinho(count) {
             if (count === undefined) {
-                // Busca a quantidade do servidor
                 fetch('/carrinho/info')
                     .then(response => response.json())
                     .then(data => {
@@ -734,7 +893,6 @@
             }
         }
 
-        // Mostra notificação temporária
         function mostrarNotificacao(mensagem, tipo) {
             const notificacao = document.createElement('div');
             notificacao.className = 'alert alert-' + tipo;
@@ -748,27 +906,15 @@
             
             document.body.appendChild(notificacao);
             
-            // Remove após 3 segundos
             setTimeout(() => {
                 notificacao.style.animation = 'fadeOut 0.5s ease-out';
                 setTimeout(() => {
-                    document.body.removeChild(notificacao);
+                    if (document.body.contains(notificacao)) {
+                        document.body.removeChild(notificacao);
+                    }
                 }, 500);
             }, 3000);
         }
     </script>
-
-    <style>
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-        }
-    </style>
 </body>
 </html>

@@ -3,6 +3,7 @@ package com.webstyle.service;
 import com.webstyle.model.Cliente;
 import com.webstyle.model.Endereco;
 import com.webstyle.repository.ClienteRepository;
+import com.webstyle.repository.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class ClienteService {
     
     @Autowired
     private ClienteRepository clienteRepository;
+    
+    @Autowired
+    private EnderecoRepository enderecoRepository;
     
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     
@@ -94,6 +98,122 @@ public class ClienteService {
         }
         
         return Optional.empty();
+    }
+    
+    /**
+     * NOVO: Atualiza dados do perfil do cliente
+     */
+    public void atualizarPerfil(Long clienteId, String nomeCompleto, LocalDate dataNascimento, String genero) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        // Validações
+        validarNomeCompleto(nomeCompleto);
+        validarIdade(dataNascimento);
+        
+        cliente.setNomeCompleto(nomeCompleto.trim());
+        cliente.setDataNascimento(dataNascimento);
+        cliente.setGenero(genero);
+        
+        clienteRepository.save(cliente);
+    }
+    
+    /**
+     * NOVO: Altera a senha do cliente
+     */
+    public void alterarSenha(Long clienteId, String senhaAtual, String novaSenha) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        // Verifica se a senha atual está correta
+        if (!passwordEncoder.matches(senhaAtual, cliente.getSenha())) {
+            throw new RuntimeException("Senha atual incorreta");
+        }
+        
+        // Valida nova senha
+        if (novaSenha == null || novaSenha.length() < 6) {
+            throw new RuntimeException("Nova senha deve ter no mínimo 6 caracteres");
+        }
+        
+        // Atualiza a senha
+        cliente.setSenha(passwordEncoder.encode(novaSenha));
+        clienteRepository.save(cliente);
+    }
+    
+    /**
+     * NOVO: Adiciona novo endereço de entrega
+     */
+    public void adicionarEndereco(Long clienteId, Endereco endereco) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        // Validações do endereço
+        if (endereco.getCep() == null || endereco.getCep().length() != 8) {
+            throw new RuntimeException("CEP inválido");
+        }
+        
+        if (endereco.getLogradouro() == null || endereco.getLogradouro().trim().isEmpty()) {
+            throw new RuntimeException("Logradouro é obrigatório");
+        }
+        
+        if (endereco.getNumero() == null || endereco.getNumero().trim().isEmpty()) {
+            throw new RuntimeException("Número é obrigatório");
+        }
+        
+        if (endereco.getBairro() == null || endereco.getBairro().trim().isEmpty()) {
+            throw new RuntimeException("Bairro é obrigatório");
+        }
+        
+        if (endereco.getCidade() == null || endereco.getCidade().trim().isEmpty()) {
+            throw new RuntimeException("Cidade é obrigatória");
+        }
+        
+        if (endereco.getEstado() == null || endereco.getEstado().length() != 2) {
+            throw new RuntimeException("Estado inválido");
+        }
+        
+        if (endereco.getApelido() == null || endereco.getApelido().trim().isEmpty()) {
+            throw new RuntimeException("Apelido do endereço é obrigatório");
+        }
+        
+        // Não permite adicionar endereço de faturamento por aqui
+        endereco.setFaturamento(false);
+        
+        cliente.addEndereco(endereco);
+        clienteRepository.save(cliente);
+    }
+    
+    /**
+     * NOVO: Remove endereço de entrega
+     */
+    public void removerEndereco(Long clienteId, Long enderecoId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        Endereco endereco = enderecoRepository.findById(enderecoId)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+        
+        // Verifica se o endereço pertence ao cliente
+        if (!endereco.getCliente().getId().equals(clienteId)) {
+            throw new RuntimeException("Endereço não pertence a este cliente");
+        }
+        
+        // Não permite remover endereço de faturamento
+        if (endereco.isFaturamento()) {
+            throw new RuntimeException("Não é possível remover o endereço de faturamento");
+        }
+        
+        // Não permite remover o último endereço de entrega
+        long qtdEnderecosEntrega = cliente.getEnderecos().stream()
+                .filter(e -> !e.isFaturamento())
+                .count();
+        
+        if (qtdEnderecosEntrega <= 1) {
+            throw new RuntimeException("É necessário ter pelo menos um endereço de entrega cadastrado");
+        }
+        
+        cliente.removeEndereco(endereco);
+        enderecoRepository.delete(endereco);
     }
     
     /**

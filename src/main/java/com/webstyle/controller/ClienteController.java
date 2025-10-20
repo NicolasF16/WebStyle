@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -34,13 +33,18 @@ public class ClienteController {
      * URL: GET /cliente/login
      */
     @GetMapping("/login")
-    public String loginForm() {
+    public String loginForm(HttpSession session, Model model) {
+        // Se já estiver logado, redireciona para home
+        if (session.getAttribute("clienteLogado") != null) {
+            return "redirect:/home";
+        }
         return "cliente-login";
     }
     
     /**
      * Processa login do cliente
      * URL: POST /cliente/login
+     * ATUALIZADO: Validação melhorada e mensagens de erro específicas
      */
     @PostMapping("/login")
     public String login(@RequestParam String email,
@@ -59,7 +63,9 @@ public class ClienteController {
             // Redireciona para a home
             return "redirect:/home";
         } else {
-            model.addAttribute("erro", "E-mail ou senha inválidos, ou conta inativa.");
+            // NOVO: Mensagem de erro mais específica
+            model.addAttribute("erro", "Usuário ou senha incorretos. Verifique seus dados e tente novamente.");
+            model.addAttribute("email", email); // Mantém o email preenchido
             return "cliente-login";
         }
     }
@@ -69,7 +75,11 @@ public class ClienteController {
      * URL: GET /cliente/cadastro
      */
     @GetMapping("/cadastro")
-    public String cadastroForm(Model model) {
+    public String cadastroForm(Model model, HttpSession session) {
+        // Se já estiver logado, redireciona para home
+        if (session.getAttribute("clienteLogado") != null) {
+            return "redirect:/home";
+        }
         model.addAttribute("cliente", new Cliente());
         return "cadastro-cliente";
     }
@@ -77,6 +87,7 @@ public class ClienteController {
     /**
      * Processa cadastro do cliente
      * URL: POST /cliente/cadastro
+     * ATUALIZADO: Auto-login após cadastro bem-sucedido
      */
     @PostMapping("/cadastro")
     public String cadastrar(@RequestParam String nomeCompleto,
@@ -105,6 +116,7 @@ public class ClienteController {
                            @RequestParam(required = false) String estadoEntrega,
                            @RequestParam(required = false) String apelidoEntrega,
                            Model model,
+                           HttpSession session,
                            RedirectAttributes redirectAttributes) {
         
         try {
@@ -168,11 +180,14 @@ public class ClienteController {
             cliente.addEndereco(enderecoEntrega);
             
             // Cadastra o cliente
-            clienteService.cadastrarCliente(cliente);
+            Cliente clienteCadastrado = clienteService.cadastrarCliente(cliente);
             
-            // Redireciona para login com mensagem de sucesso
-            redirectAttributes.addFlashAttribute("sucesso", "Cadastro realizado com sucesso! Faça login para continuar.");
-            return "redirect:/cliente/login";
+            // NOVO: Auto-login após cadastro bem-sucedido
+            session.setAttribute("clienteLogado", clienteCadastrado);
+            
+            // Redireciona para home com mensagem de sucesso
+            redirectAttributes.addFlashAttribute("sucesso", "Cadastro realizado com sucesso! Bem-vindo(a), " + clienteCadastrado.getNomeCompleto() + "!");
+            return "redirect:/home";
             
         } catch (Exception e) {
             model.addAttribute("erro", e.getMessage());
@@ -195,6 +210,180 @@ public class ClienteController {
             model.addAttribute("estadoFaturamento", estadoFaturamento);
             
             return "cadastro-cliente";
+        }
+    }
+    
+    /**
+     * NOVO: Exibe página de edição de perfil
+     * URL: GET /cliente/perfil
+     */
+    @GetMapping("/perfil")
+    public String perfilForm(HttpSession session, Model model) {
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        // Recarrega os dados do banco para garantir que estão atualizados
+        Cliente cliente = clienteService.buscarPorId(clienteLogado.getId());
+        if (cliente == null) {
+            session.removeAttribute("clienteLogado");
+            return "redirect:/cliente/login";
+        }
+        
+        model.addAttribute("cliente", cliente);
+        return "cliente-perfil";
+    }
+    
+    /**
+     * NOVO: Atualiza dados do perfil
+     * URL: POST /cliente/perfil/atualizar
+     */
+    @PostMapping("/perfil/atualizar")
+    public String atualizarPerfil(@RequestParam String nomeCompleto,
+                                  @RequestParam String dataNascimento,
+                                  @RequestParam String genero,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        try {
+            clienteService.atualizarPerfil(
+                clienteLogado.getId(),
+                nomeCompleto,
+                LocalDate.parse(dataNascimento),
+                genero
+            );
+            
+            // Atualiza a sessão com os novos dados
+            Cliente clienteAtualizado = clienteService.buscarPorId(clienteLogado.getId());
+            session.setAttribute("clienteLogado", clienteAtualizado);
+            
+            redirectAttributes.addFlashAttribute("sucesso", "Perfil atualizado com sucesso!");
+            return "redirect:/cliente/perfil";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("erro", "Erro ao atualizar perfil: " + e.getMessage());
+            return "redirect:/cliente/perfil";
+        }
+    }
+    
+    /**
+     * NOVO: Altera senha do cliente
+     * URL: POST /cliente/perfil/alterar-senha
+     */
+    @PostMapping("/perfil/alterar-senha")
+    public String alterarSenha(@RequestParam String senhaAtual,
+                              @RequestParam String novaSenha,
+                              @RequestParam String confirmarNovaSenha,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        try {
+            if (!novaSenha.equals(confirmarNovaSenha)) {
+                throw new RuntimeException("As senhas não coincidem");
+            }
+            
+            clienteService.alterarSenha(clienteLogado.getId(), senhaAtual, novaSenha);
+            
+            redirectAttributes.addFlashAttribute("sucesso", "Senha alterada com sucesso!");
+            return "redirect:/cliente/perfil";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+            return "redirect:/cliente/perfil";
+        }
+    }
+    
+    /**
+     * NOVO: Adiciona novo endereço de entrega
+     * URL: POST /cliente/perfil/adicionar-endereco
+     */
+    @PostMapping("/perfil/adicionar-endereco")
+    public String adicionarEndereco(@RequestParam String cep,
+                                    @RequestParam String logradouro,
+                                    @RequestParam String numero,
+                                    @RequestParam(required = false) String complemento,
+                                    @RequestParam String bairro,
+                                    @RequestParam String cidade,
+                                    @RequestParam String estado,
+                                    @RequestParam String apelido,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        try {
+            Endereco novoEndereco = new Endereco();
+            novoEndereco.setCep(cep.replaceAll("[^0-9]", ""));
+            novoEndereco.setLogradouro(logradouro.trim());
+            novoEndereco.setNumero(numero.trim());
+            novoEndereco.setComplemento(complemento != null ? complemento.trim() : null);
+            novoEndereco.setBairro(bairro.trim());
+            novoEndereco.setCidade(cidade.trim());
+            novoEndereco.setEstado(estado.toUpperCase());
+            novoEndereco.setApelido(apelido.trim());
+            novoEndereco.setFaturamento(false);
+            
+            clienteService.adicionarEndereco(clienteLogado.getId(), novoEndereco);
+            
+            // Atualiza a sessão
+            Cliente clienteAtualizado = clienteService.buscarPorId(clienteLogado.getId());
+            session.setAttribute("clienteLogado", clienteAtualizado);
+            
+            redirectAttributes.addFlashAttribute("sucesso", "Endereço adicionado com sucesso!");
+            return "redirect:/cliente/perfil";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("erro", "Erro ao adicionar endereço: " + e.getMessage());
+            return "redirect:/cliente/perfil";
+        }
+    }
+    
+    /**
+     * NOVO: Remove endereço de entrega
+     * URL: POST /cliente/perfil/remover-endereco/{id}
+     */
+    @PostMapping("/perfil/remover-endereco/{enderecoId}")
+    public String removerEndereco(@PathVariable Long enderecoId,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        try {
+            clienteService.removerEndereco(clienteLogado.getId(), enderecoId);
+            
+            // Atualiza a sessão
+            Cliente clienteAtualizado = clienteService.buscarPorId(clienteLogado.getId());
+            session.setAttribute("clienteLogado", clienteAtualizado);
+            
+            redirectAttributes.addFlashAttribute("sucesso", "Endereço removido com sucesso!");
+            return "redirect:/cliente/perfil";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("erro", "Erro ao remover endereço: " + e.getMessage());
+            return "redirect:/cliente/perfil";
         }
     }
     
