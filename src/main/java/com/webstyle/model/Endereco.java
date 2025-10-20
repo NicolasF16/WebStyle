@@ -46,12 +46,16 @@ public class Endereco {
     @Column
     private String apelido; // Ex: "Casa", "Trabalho", etc. (opcional, só para entrega)
     
+    @Column(nullable = false)
+    private boolean enderecoPadrao = false; // true = este é o endereço padrão para entrega
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
     
     public Endereco() {
         this.faturamento = false;
+        this.enderecoPadrao = false;
     }
     
     // Getters e Setters
@@ -133,6 +137,14 @@ public class Endereco {
     
     public void setApelido(String apelido) {
         this.apelido = apelido;
+    }
+    
+    public boolean isEnderecoPadrao() {
+        return enderecoPadrao;
+    }
+    
+    public void setEnderecoPadrao(boolean enderecoPadrao) {
+        this.enderecoPadrao = enderecoPadrao;
     }
     
     public Cliente getCliente() {

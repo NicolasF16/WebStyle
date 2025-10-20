@@ -228,6 +228,8 @@
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            padding: 8px 16px;
+            font-size: 12px;
         }
 
         .btn-danger:hover {
@@ -239,6 +241,8 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            padding: 8px 16px;
+            font-size: 12px;
         }
 
         .btn-success:hover {
@@ -271,6 +275,11 @@
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
         }
 
+        .endereco-item.padrao {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
+        }
+
         .endereco-header {
             display: flex;
             justify-content: space-between;
@@ -301,6 +310,11 @@
             color: white;
         }
 
+        .badge-success {
+            background: #10b981;
+            color: white;
+        }
+
         .endereco-detalhes {
             color: #4b5563;
             font-size: 14px;
@@ -311,6 +325,9 @@
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn-small {
@@ -353,6 +370,13 @@
             animation: slideDown 0.3s ease-out;
         }
 
+        .summary-actions {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -379,6 +403,14 @@
             }
 
             .btn {
+                width: 100%;
+            }
+
+            .endereco-actions {
+                flex-direction: column;
+            }
+
+            .endereco-actions .btn {
                 width: 100%;
             }
         }
@@ -624,7 +656,7 @@
                 <div class="enderecos-list">
                     <div class="endereco-item" 
                          th:each="endereco : ${cliente.enderecos}"
-                         th:classappend="${endereco.faturamento} ? 'faturamento' : ''">
+                         th:classappend="${endereco.faturamento} ? 'faturamento' : (${endereco.enderecoPadrao} ? 'padrao' : '')">
                         
                         <div class="endereco-header">
                             <div class="endereco-apelido">
@@ -632,6 +664,7 @@
                                 <span th:unless="${endereco.faturamento}">📦</span>
                                 <span th:text="${endereco.faturamento ? 'Endereço de Faturamento' : endereco.apelido}">Apelido</span>
                                 <span th:if="${endereco.faturamento}" class="badge badge-primary">Padrão</span>
+                                <span th:if="${!endereco.faturamento && endereco.enderecoPadrao}" class="badge badge-success">★ Padrão</span>
                             </div>
                         </div>
 
@@ -648,6 +681,17 @@
                         </div>
 
                         <div class="endereco-actions" th:unless="${endereco.faturamento}">
+                            <!-- Botão Definir como Padrão (só aparece se NÃO é padrão e há mais de um endereço de entrega) -->
+                            <form th:if="${!endereco.enderecoPadrao && cliente.getEnderecosEntrega().size() > 1}"
+                                  th:action="@{/cliente/perfil/definir-endereco-padrao/{id}(id=${endereco.id})}" 
+                                  method="post"
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-success btn-small" title="Definir como endereço padrão">
+                                    ★ Definir como Padrão
+                                </button>
+                            </form>
+
+                            <!-- Botão Remover -->
                             <form th:action="@{/cliente/perfil/remover-endereco/{id}(id=${endereco.id})}" 
                                   method="post"
                                   onsubmit="return confirm('Tem certeza que deseja remover este endereço?')"

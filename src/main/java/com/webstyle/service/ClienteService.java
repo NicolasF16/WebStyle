@@ -78,6 +78,12 @@ public class ClienteService {
         // Define status como ativo
         cliente.setStatus(Cliente.Status.ATIVO);
         
+        // Define o primeiro endereço de entrega como padrão
+        cliente.getEnderecos().stream()
+                .filter(e -> !e.isFaturamento())
+                .findFirst()
+                .ifPresent(e -> e.setEnderecoPadrao(true));
+        
         // Salva o cliente (cascade salva os endereços)
         return clienteRepository.save(cliente);
     }
@@ -101,7 +107,7 @@ public class ClienteService {
     }
     
     /**
-     * NOVO: Atualiza dados do perfil do cliente
+     * Atualiza dados do perfil do cliente
      */
     public void atualizarPerfil(Long clienteId, String nomeCompleto, LocalDate dataNascimento, String genero) {
         Cliente cliente = clienteRepository.findById(clienteId)
@@ -119,7 +125,7 @@ public class ClienteService {
     }
     
     /**
-     * NOVO: Altera a senha do cliente
+     * Altera a senha do cliente
      */
     public void alterarSenha(Long clienteId, String senhaAtual, String novaSenha) {
         Cliente cliente = clienteRepository.findById(clienteId)
@@ -141,7 +147,7 @@ public class ClienteService {
     }
     
     /**
-     * NOVO: Adiciona novo endereço de entrega
+     * Adiciona novo endereço de entrega
      */
     public void adicionarEndereco(Long clienteId, Endereco endereco) {
         Cliente cliente = clienteRepository.findById(clienteId)
@@ -179,12 +185,23 @@ public class ClienteService {
         // Não permite adicionar endereço de faturamento por aqui
         endereco.setFaturamento(false);
         
+        // Se este é o primeiro endereço de entrega, define como padrão
+        long qtdEnderecosEntrega = cliente.getEnderecos().stream()
+                .filter(e -> !e.isFaturamento())
+                .count();
+        
+        if (qtdEnderecosEntrega == 0) {
+            endereco.setEnderecoPadrao(true);
+        } else {
+            endereco.setEnderecoPadrao(false);
+        }
+        
         cliente.addEndereco(endereco);
         clienteRepository.save(cliente);
     }
     
     /**
-     * NOVO: Remove endereço de entrega
+     * Remove endereço de entrega
      */
     public void removerEndereco(Long clienteId, Long enderecoId) {
         Cliente cliente = clienteRepository.findById(clienteId)
@@ -212,8 +229,65 @@ public class ClienteService {
             throw new RuntimeException("É necessário ter pelo menos um endereço de entrega cadastrado");
         }
         
+        // Se era o endereço padrão, define outro como padrão
+        if (endereco.isEnderecoPadrao()) {
+            cliente.getEnderecos().stream()
+                    .filter(e -> !e.isFaturamento() && !e.getId().equals(enderecoId))
+                    .findFirst()
+                    .ifPresent(e -> {
+                        e.setEnderecoPadrao(true);
+                        enderecoRepository.save(e);
+                    });
+        }
+        
         cliente.removeEndereco(endereco);
         enderecoRepository.delete(endereco);
+    }
+    
+    /**
+     * Define um endereço como padrão para entrega
+     */
+    public void definirEnderecoPadrao(Long clienteId, Long enderecoId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        Endereco endereco = enderecoRepository.findById(enderecoId)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+        
+        // Verifica se o endereço pertence ao cliente
+        if (!endereco.getCliente().getId().equals(clienteId)) {
+            throw new RuntimeException("Endereço não pertence a este cliente");
+        }
+        
+        // Não permite definir endereço de faturamento como padrão
+        if (endereco.isFaturamento()) {
+            throw new RuntimeException("Não é possível definir endereço de faturamento como padrão");
+        }
+        
+        // Remove flag de endereço padrão de todos os endereços de entrega
+        cliente.getEnderecos().stream()
+                .filter(e -> !e.isFaturamento())
+                .forEach(e -> {
+                    e.setEnderecoPadrao(false);
+                    enderecoRepository.save(e);
+                });
+        
+        // Define o novo endereço como padrão
+        endereco.setEnderecoPadrao(true);
+        enderecoRepository.save(endereco);
+    }
+    
+    /**
+     * Retorna o endereço padrão para entrega
+     */
+    public Endereco obterEnderecoPadrao(Long clienteId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        return cliente.getEnderecos().stream()
+                .filter(e -> !e.isFaturamento() && e.isEnderecoPadrao())
+                .findFirst()
+                .orElse(null);
     }
     
     /**

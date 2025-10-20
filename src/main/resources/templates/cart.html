@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Carrinho de Compras - WebStyle</title>
     <meta charset="UTF-8">
@@ -588,14 +589,16 @@
             display: inline-block;
             width: 14px;
             height: 14px;
-            border: 2px solid rgba(255,255,255,.3);
+            border: 2px solid rgba(255, 255, 255, .3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes fadeOut {
@@ -603,6 +606,7 @@
                 opacity: 1;
                 transform: translateX(-50%) translateY(0);
             }
+
             to {
                 opacity: 0;
                 transform: translateX(-50%) translateY(-20px);
@@ -651,8 +655,24 @@
                 flex-direction: column;
             }
         }
+
+        .endereco-padrao-info {
+        animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
     </style>
 </head>
+
 <body>
     <!-- HEADER -->
     <div class="header">
@@ -693,52 +713,45 @@
             <!-- LISTA DE ITENS -->
             <div class="cart-items">
                 <h2>📦 Itens do Carrinho</h2>
-                
+
                 <div class="cart-item" th:each="item : ${cartItems}">
                     <div class="item-image">
-                        <img th:if="${item.imagemPrincipal != null}" 
-                             th:src="@{/{path}(path=${item.imagemPrincipal})}" 
-                             th:alt="${item.nome}">
+                        <img th:if="${item.imagemPrincipal != null}" th:src="@{/{path}(path=${item.imagemPrincipal})}"
+                            th:alt="${item.nome}">
                         <div th:unless="${item.imagemPrincipal != null}" class="no-item-image">📷</div>
                     </div>
-                    
+
                     <div class="item-details">
                         <div class="item-name" th:text="${item.nome}">Nome do Produto</div>
                         <div class="item-code" th:text="'Cód: ' + ${item.codigo}">Cód: XXXXX</div>
                         <div class="item-price">
                             R$ <span th:text="${#numbers.formatDecimal(item.preco, 1, 2)}">0,00</span>
                         </div>
-                        
+
                         <div class="item-actions">
                             <form th:action="@{/carrinho/atualizar}" method="post" style="display: inline;">
                                 <input type="hidden" name="produtoId" th:value="${item.produtoId}">
                                 <div class="quantity-controls">
-                                    <button type="button" class="qty-btn" 
-                                            th:onclick="'decrementQty(' + ${item.produtoId} + ')'">−</button>
-                                    <input type="number" 
-                                           class="qty-input" 
-                                           th:id="'qty-' + ${item.produtoId}"
-                                           name="quantidade"
-                                           th:value="${item.quantidade}"
-                                           min="1"
-                                           readonly>
-                                    <button type="button" class="qty-btn" 
-                                            th:onclick="'incrementQty(' + ${item.produtoId} + ')'">+</button>
-                                    <button type="submit" 
-                                            style="display: none;" 
-                                            th:id="'btnUpdate-' + ${item.produtoId}">Atualizar</button>
+                                    <button type="button" class="qty-btn"
+                                        th:onclick="'decrementQty(' + ${item.produtoId} + ')'">−</button>
+                                    <input type="number" class="qty-input" th:id="'qty-' + ${item.produtoId}"
+                                        name="quantidade" th:value="${item.quantidade}" min="1" readonly>
+                                    <button type="button" class="qty-btn"
+                                        th:onclick="'incrementQty(' + ${item.produtoId} + ')'">+</button>
+                                    <button type="submit" style="display: none;"
+                                        th:id="'btnUpdate-' + ${item.produtoId}">Atualizar</button>
                                 </div>
                             </form>
-                            
+
                             <form th:action="@{/carrinho/remover}" method="post" style="display: inline;">
                                 <input type="hidden" name="produtoId" th:value="${item.produtoId}">
                                 <button type="submit" class="btn-remove"
-                                        onclick="return confirm('Deseja remover este item do carrinho?')">
+                                    onclick="return confirm('Deseja remover este item do carrinho?')">
                                     🗑️ Remover
                                 </button>
                             </form>
                         </div>
-                        
+
                         <div class="item-subtotal">
                             <div class="subtotal-label">Subtotal</div>
                             <div class="subtotal-value">
@@ -752,55 +765,71 @@
             <!-- RESUMO DO CARRINHO -->
             <div class="cart-summary">
                 <h2>💰 Resumo do Pedido</h2>
-                
+
                 <!-- SEÇÃO DE FRETE -->
                 <div class="shipping-section">
                     <div class="shipping-title">
                         🚚 Calcular Frete
                     </div>
-                    
+
+                    <!-- Mostra endereço padrão pré-carregado se cliente estiver logado -->
+                    <div th:if="${enderecoPadrao != null}" class="endereco-padrao-info"
+                        style="background: #d1fae5; border: 1px solid #10b981; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <strong style="color: #065f46; display: block; margin-bottom: 8px;">✓ Usando Endereço
+                            Padrão:</strong>
+                        <div style="color: #065f46; font-size: 13px; line-height: 1.6;">
+                            <span th:text="${enderecoPadrao.apelido}">Apelido</span> -
+                            <span th:text="${enderecoPadrao.logradouro}">Rua</span>,
+                            <span th:text="${enderecoPadrao.numero}">123</span>
+                            <span th:if="${enderecoPadrao.complemento}"
+                                th:text="' - ' + ${enderecoPadrao.complemento}"></span>
+                            <br>
+                            <span th:text="${enderecoPadrao.bairro}">Bairro</span> -
+                            <span th:text="${enderecoPadrao.cidade}">Cidade</span>/<span
+                                th:text="${enderecoPadrao.estado}">UF</span>
+                            <br>
+                            CEP: <span
+                                th:text="${#strings.substring(enderecoPadrao.cep, 0, 5) + '-' + #strings.substring(enderecoPadrao.cep, 5, 8)}">00000-000</span>
+                        </div>
+                    </div>
+
                     <div class="cep-input-group">
-                        <input type="text" 
-                               id="cepInput" 
-                               class="cep-input" 
-                               placeholder="Digite seu CEP"
-                               maxlength="9"
-                               oninput="formatarCep(this)">
-                        <button type="button" 
-                                class="btn-calc-frete" 
-                                id="btnCalcFrete"
-                                onclick="calcularFrete()">
+                        <input type="text" id="cepInput" class="cep-input" placeholder="Digite seu CEP" maxlength="9"
+                            th:value="${cepPadrao}" oninput="formatarCep(this)">
+                        <button type="button" class="btn-calc-frete" id="btnCalcFrete" onclick="calcularFrete()">
                             Calcular
                         </button>
                     </div>
-                    
+
                     <div id="cepInfo" style="display: none;"></div>
                     <div id="shippingOptions" style="display: none;"></div>
                 </div>
-                
+
                 <div class="summary-row">
                     <span class="summary-label">Subtotal (<span th:text="${cartItemCount}">0</span> itens):</span>
-                    <span class="summary-value" id="subtotalValue">R$ <span th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">0,00</span></span>
+                    <span class="summary-value" id="subtotalValue">R$ <span
+                            th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">0,00</span></span>
                 </div>
-                
+
                 <div class="summary-row" id="freteRow" style="display: none;">
                     <span class="summary-label">Frete:</span>
                     <span class="summary-value" id="freteValue">R$ 0,00</span>
                 </div>
-                
+
                 <div class="summary-row summary-total">
                     <span class="total-label">Total:</span>
-                    <span class="total-value" id="totalValue">R$ <span th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">0,00</span></span>
+                    <span class="total-value" id="totalValue">R$ <span
+                            th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">0,00</span></span>
                 </div>
-                
+
                 <div class="summary-actions">
                     <button type="button" class="btn-checkout" id="btnCheckout" onclick="finalizarCompra()">
                         ✅ Finalizar Compra
                     </button>
-                    
+
                     <form th:action="@{/carrinho/limpar}" method="post">
                         <button type="submit" class="btn-clear"
-                                onclick="return confirm('Deseja limpar todo o carrinho?')">
+                            onclick="return confirm('Deseja limpar todo o carrinho?')">
                             🗑️ Limpar Carrinho
                         </button>
                     </form>
@@ -810,6 +839,22 @@
     </div>
 
     <script th:inline="javascript">
+        // Se há endereço padrão pré-carregado, calcula o frete automaticamente
+    document.addEventListener('DOMContentLoaded', function() {
+        const cepPadrao = /*[[${cepPadrao}]]*/ null;
+        
+        if (cepPadrao && cepPadrao.trim() !== '') {
+            console.log('Carregando frete para CEP padrão:', cepPadrao);
+            
+            // Aguarda um pouco e depois calcula o frete automaticamente
+            setTimeout(function() {
+                const cepInput = document.getElementById('cepInput');
+                if (cepInput && cepInput.value.trim() !== '') {
+                    calcularFrete();
+                }
+            }, 500);
+        }
+    });
         /*<![CDATA[*/
         const subtotalOriginal = /*[[${cartTotal}]]*/ 0;
         let freteSelecionado = null;
@@ -830,20 +875,20 @@
         function calcularFrete() {
             const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
             const btnCalc = document.getElementById('btnCalcFrete');
-            
+
             if (cep.length !== 8) {
                 alert('Digite um CEP válido com 8 dígitos.');
                 return;
             }
-            
+
             // Desabilita botão e mostra loading
             btnCalc.disabled = true;
             btnCalc.innerHTML = '<span class="loading"></span> Calculando...';
-            
+
             // Limpa opções anteriores
             document.getElementById('shippingOptions').style.display = 'none';
             document.getElementById('cepInfo').style.display = 'none';
-            
+
             // Faz requisição
             fetch('/frete/calcular', {
                 method: 'POST',
@@ -852,24 +897,24 @@
                 },
                 body: 'cep=' + cep
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    cepConsultado = data.cepInfo;
-                    exibirCepInfo(data.cepInfo);
-                    exibirOpcoesFlrete(data.opcoes);
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Erro ao calcular frete. Tente novamente.');
-            })
-            .finally(() => {
-                btnCalc.disabled = false;
-                btnCalc.innerHTML = 'Calcular';
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        cepConsultado = data.cepInfo;
+                        exibirCepInfo(data.cepInfo);
+                        exibirOpcoesFlrete(data.opcoes);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao calcular frete. Tente novamente.');
+                })
+                .finally(() => {
+                    btnCalc.disabled = false;
+                    btnCalc.innerHTML = 'Calcular';
+                });
         }
 
         // Exibe informações do CEP
@@ -880,7 +925,7 @@
                 cepInfo.bairro,
                 cepInfo.localidade + ' - ' + cepInfo.uf
             ].filter(x => x && x.trim()).join(', ');
-            
+
             cepInfoDiv.innerHTML = `
                 <div class="cep-info">
                     <strong>📍 CEP:</strong> ${cepInfo.cep}<br>
@@ -894,16 +939,16 @@
         function exibirOpcoesFlrete(opcoes) {
             // IMPORTANTE: Armazena as opções globalmente
             opcoesFreteGlobal = opcoes;
-            
+
             const container = document.getElementById('shippingOptions');
-            
+
             let html = '<div class="shipping-title" style="margin-top: 15px;">Escolha o frete:</div>';
             html += '<div class="shipping-options">';
-            
+
             opcoes.forEach((opcao, index) => {
-                const valorFormatado = opcao.freteGratis ? 'GRÁTIS' : 
+                const valorFormatado = opcao.freteGratis ? 'GRÁTIS' :
                     'R$ ' + parseFloat(opcao.valor).toFixed(2).replace('.', ',');
-                
+
                 html += `
                     <div class="shipping-option" data-index="${index}" onclick="selecionarFreteByIndex(${index})">
                         <div class="shipping-option-header">
@@ -920,12 +965,12 @@
                     </div>
                 `;
             });
-            
+
             html += '</div>';
             container.innerHTML = html;
             container.style.display = 'block';
         }
-        
+
         // Seleciona frete por índice (NOVA FUNÇÃO)
         function selecionarFreteByIndex(index) {
             const opcao = opcoesFreteGlobal[index];
@@ -939,7 +984,7 @@
         // Seleciona frete
         function selecionarFrete(opcao) {
             console.log('Selecionando frete:', opcao);
-            
+
             fetch('/frete/selecionar', {
                 method: 'POST',
                 headers: {
@@ -947,37 +992,37 @@
                 },
                 body: 'tipoFrete=' + opcao.tipo
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Resposta do servidor:', data);
-                
-                if (data.success) {
-                    freteSelecionado = opcao;
-                    
-                    // Atualiza visual das opções
-                    document.querySelectorAll('.shipping-option').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    
-                    // Seleciona a opção clicada
-                    const opcaoElement = document.querySelector(`.shipping-option[data-index="${opcoesFreteGlobal.indexOf(opcao)}"]`);
-                    if (opcaoElement) {
-                        opcaoElement.classList.add('selected');
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Resposta do servidor:', data);
+
+                    if (data.success) {
+                        freteSelecionado = opcao;
+
+                        // Atualiza visual das opções
+                        document.querySelectorAll('.shipping-option').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+
+                        // Seleciona a opção clicada
+                        const opcaoElement = document.querySelector(`.shipping-option[data-index="${opcoesFreteGlobal.indexOf(opcao)}"]`);
+                        if (opcaoElement) {
+                            opcaoElement.classList.add('selected');
+                        }
+
+                        // Atualiza resumo
+                        atualizarResumo(data.valorFrete, data.valorTotal);
+
+                        // Mostra notificação
+                        mostrarNotificacao(data.message, 'success');
+                    } else {
+                        alert(data.message);
                     }
-                    
-                    // Atualiza resumo
-                    atualizarResumo(data.valorFrete, data.valorTotal);
-                    
-                    // Mostra notificação
-                    mostrarNotificacao(data.message, 'success');
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Erro ao selecionar frete. Tente novamente.');
-            });
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao selecionar frete. Tente novamente.');
+                });
         }
 
         // Atualiza resumo do pedido
@@ -985,15 +1030,15 @@
             const freteRow = document.getElementById('freteRow');
             const freteValue = document.getElementById('freteValue');
             const totalValue = document.getElementById('totalValue');
-            
+
             freteRow.style.display = 'flex';
-            
+
             if (valorFrete === 0 || valorFrete === '0.00') {
                 freteValue.innerHTML = '<span style="color: #10b981; font-weight: 700;">GRÁTIS 🎉</span>';
             } else {
                 freteValue.textContent = 'R$ ' + parseFloat(valorFrete).toFixed(2).replace('.', ',');
             }
-            
+
             totalValue.textContent = 'R$ ' + parseFloat(valorTotal).toFixed(2).replace('.', ',');
         }
 
@@ -1004,12 +1049,12 @@
                 document.getElementById('cepInput').focus();
                 return;
             }
-            
+
             alert(`Compra finalizada!\n\n` +
-                  `Endereço: ${cepConsultado.localidade} - ${cepConsultado.uf}\n` +
-                  `Frete: ${freteSelecionado.nome}\n` +
-                  `Prazo: ${freteSelecionado.prazoFormatado}\n\n` +
-                  `Funcionalidade de pagamento em desenvolvimento!`);
+                `Endereço: ${cepConsultado.localidade} - ${cepConsultado.uf}\n` +
+                `Frete: ${freteSelecionado.nome}\n` +
+                `Prazo: ${freteSelecionado.prazoFormatado}\n\n` +
+                `Funcionalidade de pagamento em desenvolvimento!`);
         }
 
         // Incrementa quantidade
@@ -1040,9 +1085,9 @@
             notificacao.style.transform = 'translateX(-50%)';
             notificacao.style.zIndex = '9999';
             notificacao.style.minWidth = '300px';
-            
+
             document.body.appendChild(notificacao);
-            
+
             setTimeout(() => {
                 notificacao.style.animation = 'fadeOut 0.5s ease-out';
                 setTimeout(() => {
@@ -1054,10 +1099,10 @@
         }
 
         // Permite Enter no campo CEP
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const cepInput = document.getElementById('cepInput');
             if (cepInput) {
-                cepInput.addEventListener('keypress', function(e) {
+                cepInput.addEventListener('keypress', function (e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         calcularFrete();
@@ -1067,4 +1112,5 @@
         });
     </script>
 </body>
+
 </html>

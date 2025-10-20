@@ -44,7 +44,6 @@ public class ClienteController {
     /**
      * Processa login do cliente
      * URL: POST /cliente/login
-     * ATUALIZADO: Validação melhorada e mensagens de erro específicas
      */
     @PostMapping("/login")
     public String login(@RequestParam String email,
@@ -63,9 +62,9 @@ public class ClienteController {
             // Redireciona para a home
             return "redirect:/home";
         } else {
-            // NOVO: Mensagem de erro mais específica
+            // Mensagem de erro específica
             model.addAttribute("erro", "Usuário ou senha incorretos. Verifique seus dados e tente novamente.");
-            model.addAttribute("email", email); // Mantém o email preenchido
+            model.addAttribute("email", email);
             return "cliente-login";
         }
     }
@@ -87,7 +86,6 @@ public class ClienteController {
     /**
      * Processa cadastro do cliente
      * URL: POST /cliente/cadastro
-     * ATUALIZADO: Auto-login após cadastro bem-sucedido
      */
     @PostMapping("/cadastro")
     public String cadastrar(@RequestParam String nomeCompleto,
@@ -144,6 +142,7 @@ public class ClienteController {
             enderecoFaturamento.setCidade(cidadeFaturamento.trim());
             enderecoFaturamento.setEstado(estadoFaturamento.toUpperCase());
             enderecoFaturamento.setFaturamento(true);
+            enderecoFaturamento.setEnderecoPadrao(false);
             
             cliente.addEndereco(enderecoFaturamento);
             
@@ -176,13 +175,14 @@ public class ClienteController {
             
             enderecoEntrega.setFaturamento(false);
             enderecoEntrega.setApelido(apelidoEntrega != null && !apelidoEntrega.trim().isEmpty() ? apelidoEntrega.trim() : "Principal");
+            enderecoEntrega.setEnderecoPadrao(true); // Primeiro endereço de entrega é padrão
             
             cliente.addEndereco(enderecoEntrega);
             
             // Cadastra o cliente
             Cliente clienteCadastrado = clienteService.cadastrarCliente(cliente);
             
-            // NOVO: Auto-login após cadastro bem-sucedido
+            // Auto-login após cadastro bem-sucedido
             session.setAttribute("clienteLogado", clienteCadastrado);
             
             // Redireciona para home com mensagem de sucesso
@@ -214,7 +214,7 @@ public class ClienteController {
     }
     
     /**
-     * NOVO: Exibe página de edição de perfil
+     * Exibe página de edição de perfil
      * URL: GET /cliente/perfil
      */
     @GetMapping("/perfil")
@@ -237,7 +237,7 @@ public class ClienteController {
     }
     
     /**
-     * NOVO: Atualiza dados do perfil
+     * Atualiza dados do perfil
      * URL: POST /cliente/perfil/atualizar
      */
     @PostMapping("/perfil/atualizar")
@@ -275,7 +275,7 @@ public class ClienteController {
     }
     
     /**
-     * NOVO: Altera senha do cliente
+     * Altera senha do cliente
      * URL: POST /cliente/perfil/alterar-senha
      */
     @PostMapping("/perfil/alterar-senha")
@@ -308,7 +308,7 @@ public class ClienteController {
     }
     
     /**
-     * NOVO: Adiciona novo endereço de entrega
+     * Adiciona novo endereço de entrega
      * URL: POST /cliente/perfil/adicionar-endereco
      */
     @PostMapping("/perfil/adicionar-endereco")
@@ -357,7 +357,7 @@ public class ClienteController {
     }
     
     /**
-     * NOVO: Remove endereço de entrega
+     * Remove endereço de entrega
      * URL: POST /cliente/perfil/remover-endereco/{id}
      */
     @PostMapping("/perfil/remover-endereco/{enderecoId}")
@@ -383,6 +383,37 @@ public class ClienteController {
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("erro", "Erro ao remover endereço: " + e.getMessage());
+            return "redirect:/cliente/perfil";
+        }
+    }
+    
+    /**
+     * Define endereço como padrão
+     * URL: POST /cliente/perfil/definir-endereco-padrao/{enderecoId}
+     */
+    @PostMapping("/perfil/definir-endereco-padrao/{enderecoId}")
+    public String definirEnderecoPadrao(@PathVariable Long enderecoId,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
+        
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        try {
+            clienteService.definirEnderecoPadrao(clienteLogado.getId(), enderecoId);
+            
+            // Atualiza a sessão
+            Cliente clienteAtualizado = clienteService.buscarPorId(clienteLogado.getId());
+            session.setAttribute("clienteLogado", clienteAtualizado);
+            
+            redirectAttributes.addFlashAttribute("sucesso", "Endereço definido como padrão!");
+            return "redirect:/cliente/perfil";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("erro", "Erro ao definir endereço padrão: " + e.getMessage());
             return "redirect:/cliente/perfil";
         }
     }
