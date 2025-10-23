@@ -20,7 +20,8 @@
         </ul>
         
         <div class="logout-section">
-            <a th:href="@{/login}" class="logout-btn">Logout</a>
+            <a th:href="@{/login}" class="logout-btn" onclick="return confirmarLogout(event)">Logout</a>
+
         </div>
     </div>
         <style>
@@ -57,5 +58,20 @@
             background: #c82333;
         }
     </style>
+
+    <script>
+    function confirmarLogout(event) {
+        event.preventDefault();
+        
+        const confirmacao = confirm('Tem certeza que deseja sair do sistema?');
+        
+        if (confirmacao) {
+            window.location.href = event.target.href || event.currentTarget.href;
+        }
+        
+        return false;
+    }
+</script>
+
 </body>
 </html>
