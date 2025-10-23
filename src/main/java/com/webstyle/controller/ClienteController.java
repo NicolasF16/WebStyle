@@ -86,6 +86,8 @@ public class ClienteController {
     /**
      * Processa cadastro do cliente
      * URL: POST /cliente/cadastro
+     * 
+     * ALTERAÇÃO: Agora redireciona para a tela de login após cadastro bem-sucedido
      */
     @PostMapping("/cadastro")
     public String cadastrar(@RequestParam String nomeCompleto,
@@ -182,12 +184,14 @@ public class ClienteController {
             // Cadastra o cliente
             Cliente clienteCadastrado = clienteService.cadastrarCliente(cliente);
             
-            // Auto-login após cadastro bem-sucedido
-            session.setAttribute("clienteLogado", clienteCadastrado);
+            // ===== ALTERAÇÃO PRINCIPAL =====
+            // Redireciona para a tela de login com mensagem de sucesso
+            redirectAttributes.addFlashAttribute("sucesso", 
+                "Cadastro realizado com sucesso, " + clienteCadastrado.getNomeCompleto() + "! " +
+                "Agora você pode fazer login com seu e-mail e senha.");
             
-            // Redireciona para home com mensagem de sucesso
-            redirectAttributes.addFlashAttribute("sucesso", "Cadastro realizado com sucesso! Bem-vindo(a), " + clienteCadastrado.getNomeCompleto() + "!");
-            return "redirect:/home";
+            return "redirect:/cliente/login";
+            // ===== FIM DA ALTERAÇÃO =====
             
         } catch (Exception e) {
             model.addAttribute("erro", e.getMessage());
