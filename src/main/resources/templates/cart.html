@@ -5,7 +5,6 @@
     <title>Carrinho de Compras - WebStyle</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- ESTILOS MANTIDOS IGUAIS - Omitidos aqui para brevidade -->
     <style>
         * {
             margin: 0;
@@ -357,6 +356,185 @@
             border-bottom: 2px solid #e5e7eb;
         }
 
+        /* SEÇÃO DE ENDEREÇOS */
+        .address-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .address-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .address-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Scrollbar customizada */
+        .address-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .address-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .address-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .address-list::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        .address-item {
+            position: relative;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .address-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .address-item.selected {
+            border-color: #10b981;
+            background: #d1fae5;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .address-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .address-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .checkbox-icon {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            margin-top: 2px;
+        }
+
+        .address-item.selected .checkbox-icon {
+            border-color: #10b981;
+            background: #10b981;
+        }
+
+        .checkbox-icon::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s;
+        }
+
+        .address-item.selected .checkbox-icon::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .address-content {
+            flex: 1;
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .address-apelido {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .address-badge {
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .address-badge.default {
+            background: #10b981;
+        }
+
+        .address-details {
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .no-address {
+            text-align: center;
+            padding: 30px 20px;
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            border-radius: 10px;
+            color: #856404;
+        }
+
+        .no-address-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .no-address p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .no-address a {
+            color: #667eea;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .no-address a:hover {
+            text-decoration: underline;
+        }
+
         /* SEÇÃO DE FRETE */
         .shipping-section {
             background: #f8f9fa;
@@ -375,59 +553,13 @@
             gap: 8px;
         }
 
-        .cep-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .cep-input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .cep-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn-calc-frete {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-calc-frete:hover {
-            background: #764ba2;
-            transform: translateY(-1px);
-        }
-
-        .btn-calc-frete:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .cep-info {
+        .shipping-info {
             background: #e0e7ff;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 13px;
             color: #1f2937;
-        }
-
-        .cep-info strong {
-            color: #667eea;
         }
 
         .shipping-options {
@@ -652,23 +784,8 @@
                 flex-wrap: wrap;
             }
 
-            .cep-input-group {
-                flex-direction: column;
-            }
-        }
-
-        .endereco-padrao-info {
-            animation: slideDown 0.5s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .address-list {
+                max-height: none;
             }
         }
     </style>
@@ -767,43 +884,70 @@
             <div class="cart-summary">
                 <h2>💰 Resumo do Pedido</h2>
 
-                <!-- SEÇÃO DE FRETE -->
-                <div class="shipping-section">
-                    <div class="shipping-title">
-                        🚚 Calcular Frete
+                <!-- SEÇÃO DE ENDEREÇOS -->
+                <div class="address-section">
+                    <div class="address-title">
+                        📍 Selecione o Endereço de Entrega
                     </div>
 
-                    <!-- Mostra endereço padrão pré-carregado se cliente estiver logado -->
-                    <div th:if="${enderecoPadrao != null}" class="endereco-padrao-info"
-                        style="background: #d1fae5; border: 1px solid #10b981; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                        <strong style="color: #065f46; display: block; margin-bottom: 8px;">✓ Usando Endereço
-                            Padrão:</strong>
-                        <div style="color: #065f46; font-size: 13px; line-height: 1.6;">
-                            <span th:text="${enderecoPadrao.apelido}">Apelido</span> -
-                            <span th:text="${enderecoPadrao.logradouro}">Rua</span>,
-                            <span th:text="${enderecoPadrao.numero}">123</span>
-                            <span th:if="${enderecoPadrao.complemento}"
-                                th:text="' - ' + ${enderecoPadrao.complemento}"></span>
-                            <br>
-                            <span th:text="${enderecoPadrao.bairro}">Bairro</span> -
-                            <span th:text="${enderecoPadrao.cidade}">Cidade</span>/<span
-                                th:text="${enderecoPadrao.estado}">UF</span>
-                            <br>
-                            CEP: <span
-                                th:text="${#strings.substring(enderecoPadrao.cep, 0, 5) + '-' + #strings.substring(enderecoPadrao.cep, 5, 8)}">00000-000</span>
+                    <!-- Lista de endereços (se cliente estiver logado) -->
+                    <div th:if="${session.clienteLogado != null and session.clienteLogado.enderecosEntrega != null and !session.clienteLogado.enderecosEntrega.isEmpty()}"
+                        class="address-list">
+                        <div class="address-item"
+                            th:each="endereco : ${session.clienteLogado.enderecosEntrega}"
+                            th:data-endereco-id="${endereco.id}"
+                            th:classappend="${endereco.enderecoPadrao} ? 'selected' : ''"
+                            onclick="selecionarEndereco(this)">
+                            <input type="radio" name="enderecoSelecionado" th:value="${endereco.id}"
+                                th:checked="${endereco.enderecoPadrao}">
+                            <div class="address-checkbox">
+                                <div class="checkbox-icon"></div>
+                                <div class="address-content">
+                                    <div class="address-header">
+                                        <span class="address-apelido" th:text="${endereco.apelido}">Apelido</span>
+                                        <span th:if="${endereco.enderecoPadrao}"
+                                            class="address-badge default">Padrão</span>
+                                    </div>
+                                    <div class="address-details">
+                                        <span th:text="${endereco.logradouro}">Logradouro</span>,
+                                        <span th:text="${endereco.numero}">123</span>
+                                        <span th:if="${endereco.complemento}"
+                                            th:text="' - ' + ${endereco.complemento}"></span>
+                                        <br>
+                                        <span th:text="${endereco.bairro}">Bairro</span> -
+                                        <span th:text="${endereco.cidade}">Cidade</span>/<span
+                                            th:text="${endereco.estado}">UF</span>
+                                        <br>
+                                        CEP: <span
+                                            th:text="${#strings.substring(endereco.cep, 0, 5) + '-' + #strings.substring(endereco.cep, 5, 8)}">00000-000</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="cep-input-group">
-                        <input type="text" id="cepInput" class="cep-input" placeholder="Digite seu CEP" maxlength="9"
-                            th:value="${cepPadrao}" oninput="formatarCep(this)">
-                        <button type="button" class="btn-calc-frete" id="btnCalcFrete" onclick="calcularFrete()">
-                            Calcular
-                        </button>
+                    <!-- Sem endereços cadastrados -->
+                    <div th:if="${session.clienteLogado == null or session.clienteLogado.enderecosEntrega == null or session.clienteLogado.enderecosEntrega.isEmpty()}"
+                        class="no-address">
+                        <div class="no-address-icon">📍</div>
+                        <p><strong>Nenhum endereço cadastrado</strong></p>
+                        <p th:if="${session.clienteLogado != null}">
+                            <a href="/cliente/perfil">Cadastre um endereço</a> para calcular o frete
+                        </p>
+                        <p th:unless="${session.clienteLogado != null}">
+                            <a href="/cliente/login">Faça login</a> para selecionar um endereço
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO DE FRETE -->
+                <div class="shipping-section" id="shippingSection" style="display: none;">
+                    <div class="shipping-title">
+                        🚚 Opções de Frete
                     </div>
 
-                    <div id="cepInfo" style="display: none;"></div>
-                    <div id="shippingOptions" style="display: none;"></div>
+                    <div id="shippingInfo" class="shipping-info" style="display: none;"></div>
+                    <div id="shippingOptions" class="shipping-options"></div>
                 </div>
 
                 <div class="summary-row">
@@ -840,61 +984,92 @@
     </div>
 
     <script th:inline="javascript">
-        // ===== VARIÁVEL PARA VERIFICAR SE O CLIENTE ESTÁ LOGADO =====
+        // ===== VARIÁVEIS GLOBAIS =====
         /*<![CDATA[*/
         const clienteLogado = /*[[${session.clienteLogado != null}]]*/ false;
+        const subtotalOriginal = /*[[${cartTotal}]]*/ 0;
         /*]]>*/
 
-        // Se há endereço padrão pré-carregado, calcula o frete automaticamente
-        document.addEventListener('DOMContentLoaded', function() {
-            const cepPadrao = /*[[${cepPadrao}]]*/ null;
-            
-            if (cepPadrao && cepPadrao.trim() !== '') {
-                console.log('Carregando frete para CEP padrão:', cepPadrao);
-                
-                // Aguarda um pouco e depois calcula o frete automaticamente
-                setTimeout(function() {
-                    const cepInput = document.getElementById('cepInput');
-                    if (cepInput && cepInput.value.trim() !== '') {
-                        calcularFrete();
-                    }
+        let enderecoSelecionadoId = null;
+        let freteSelecionado = null;
+        let opcoesFreteGlobal = [];
+        let cepAtual = null;
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('=== INICIALIZANDO CARRINHO ===');
+            console.log('Cliente logado:', clienteLogado);
+
+            // Se há endereço padrão selecionado, calcula o frete automaticamente
+            const enderecoSelecionado = document.querySelector('.address-item.selected');
+            if (enderecoSelecionado) {
+                const enderecoId = enderecoSelecionado.dataset.enderecoId;
+                console.log('Endereço padrão encontrado:', enderecoId);
+                enderecoSelecionadoId = enderecoId;
+
+                // Aguarda um pouco e calcula o frete
+                setTimeout(function () {
+                    calcularFreteParaEndereco(enderecoId);
                 }, 500);
             }
         });
 
-        /*<![CDATA[*/
-        const subtotalOriginal = /*[[${cartTotal}]]*/ 0;
-        let freteSelecionado = null;
-        let cepConsultado = null;
-        let opcoesFreteGlobal = [];
-        /*]]>*/
+        // ===== SELEÇÃO DE ENDEREÇO =====
+        function selecionarEndereco(element) {
+            console.log('=== SELECIONANDO ENDEREÇO ===');
 
-        // Formata CEP enquanto digita
-        function formatarCep(input) {
-            let valor = input.value.replace(/\D/g, '');
-            if (valor.length > 5) {
-                valor = valor.substring(0, 5) + '-' + valor.substring(5, 8);
-            }
-            input.value = valor;
+            // Remove seleção anterior
+            document.querySelectorAll('.address-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Adiciona seleção ao novo
+            element.classList.add('selected');
+
+            // Marca o radio button
+            const radio = element.querySelector('input[type="radio"]');
+            radio.checked = true;
+
+            // Obtém ID do endereço
+            const enderecoId = element.dataset.enderecoId;
+            enderecoSelecionadoId = enderecoId;
+
+            console.log('Endereço selecionado:', enderecoId);
+
+            // Calcula frete para o novo endereço
+            calcularFreteParaEndereco(enderecoId);
         }
 
-        // Calcula frete
-        function calcularFrete() {
-            const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
-            const btnCalc = document.getElementById('btnCalcFrete');
+        // ===== CALCULAR FRETE PARA ENDEREÇO =====
+        function calcularFreteParaEndereco(enderecoId) {
+            console.log('=== CALCULANDO FRETE PARA ENDEREÇO ===');
+            console.log('Endereço ID:', enderecoId);
 
-            if (cep.length !== 8) {
-                alert('Digite um CEP válido com 8 dígitos.');
+            // Obtém o CEP do endereço selecionado
+            const enderecoElement = document.querySelector(`[data-endereco-id="${enderecoId}"]`);
+            if (!enderecoElement) {
+                console.error('Elemento de endereço não encontrado');
                 return;
             }
 
-            // Desabilita botão e mostra loading
-            btnCalc.disabled = true;
-            btnCalc.innerHTML = '<span class="loading"></span> Calculando...';
+            // Extrai CEP do texto
+            const addressText = enderecoElement.querySelector('.address-details').textContent;
+            const cepMatch = addressText.match(/CEP:\s*(\d{5}-\d{3})/);
 
-            // Limpa opções anteriores
-            document.getElementById('shippingOptions').style.display = 'none';
-            document.getElementById('cepInfo').style.display = 'none';
+            if (!cepMatch) {
+                console.error('CEP não encontrado no endereço');
+                mostrarNotificacao('Erro ao obter CEP do endereço', 'error');
+                return;
+            }
+
+            const cep = cepMatch[1].replace('-', '');
+            cepAtual = cep;
+            console.log('CEP extraído:', cep);
+
+            // Mostra loading
+            const shippingSection = document.getElementById('shippingSection');
+            shippingSection.style.display = 'block';
+            document.getElementById('shippingOptions').innerHTML = '<p style="text-align: center; color: #6b7280;">⏳ Calculando frete...</p>';
 
             // Faz requisição
             fetch('/frete/calcular', {
@@ -906,51 +1081,42 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Resposta do servidor:', data);
+
                     if (data.success) {
-                        cepConsultado = data.cepInfo;
-                        exibirCepInfo(data.cepInfo);
-                        exibirOpcoesFlrete(data.opcoes);
+                        exibirOpcoesFlrete(data.opcoes, data.cepInfo);
                     } else {
-                        alert(data.message);
+                        console.error('Erro:', data.message);
+                        document.getElementById('shippingOptions').innerHTML =
+                            '<p style="text-align: center; color: #ef4444;">❌ ' + data.message + '</p>';
                     }
                 })
                 .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao calcular frete. Tente novamente.');
-                })
-                .finally(() => {
-                    btnCalc.disabled = false;
-                    btnCalc.innerHTML = 'Calcular';
+                    console.error('Erro na requisição:', error);
+                    document.getElementById('shippingOptions').innerHTML =
+                        '<p style="text-align: center; color: #ef4444;">❌ Erro ao calcular frete</p>';
                 });
         }
 
-        // Exibe informações do CEP
-        function exibirCepInfo(cepInfo) {
-            const cepInfoDiv = document.getElementById('cepInfo');
-            const endereco = [
-                cepInfo.logradouro,
-                cepInfo.bairro,
-                cepInfo.localidade + ' - ' + cepInfo.uf
-            ].filter(x => x && x.trim()).join(', ');
+        // ===== EXIBIR OPÇÕES DE FRETE =====
+        function exibirOpcoesFlrete(opcoes, cepInfo) {
+            console.log('=== EXIBINDO OPÇÕES DE FRETE ===');
+            console.log('Opções:', opcoes);
 
-            cepInfoDiv.innerHTML = `
-                <div class="cep-info">
-                    <strong>📍 CEP:</strong> ${cepInfo.cep}<br>
-                    <strong>Endereço:</strong> ${endereco || 'Não especificado'}
-                </div>
-            `;
-            cepInfoDiv.style.display = 'block';
-        }
-
-        // Exibe opções de frete
-        function exibirOpcoesFlrete(opcoes) {
-            // IMPORTANTE: Armazena as opções globalmente
+            // Armazena opções globalmente
             opcoesFreteGlobal = opcoes;
 
-            const container = document.getElementById('shippingOptions');
+            // Exibe informações do CEP
+            const shippingInfo = document.getElementById('shippingInfo');
+            shippingInfo.innerHTML = `
+                <strong>📍 Entrega para:</strong><br>
+                ${cepInfo.localidade} - ${cepInfo.uf}
+            `;
+            shippingInfo.style.display = 'block';
 
-            let html = '<div class="shipping-title" style="margin-top: 15px;">Escolha o frete:</div>';
-            html += '<div class="shipping-options">';
+            // Exibe opções
+            const container = document.getElementById('shippingOptions');
+            let html = '';
 
             opcoes.forEach((opcao, index) => {
                 const valorFormatado = opcao.freteGratis ? 'GRÁTIS' :
@@ -973,12 +1139,17 @@
                 `;
             });
 
-            html += '</div>';
             container.innerHTML = html;
-            container.style.display = 'block';
+
+            // Seleciona automaticamente a primeira opção
+            if (opcoes.length > 0) {
+                setTimeout(() => {
+                    selecionarFreteByIndex(0);
+                }, 100);
+            }
         }
 
-        // Seleciona frete por índice (NOVA FUNÇÃO)
+        // ===== SELECIONAR FRETE POR ÍNDICE =====
         function selecionarFreteByIndex(index) {
             const opcao = opcoesFreteGlobal[index];
             if (!opcao) {
@@ -988,9 +1159,10 @@
             selecionarFrete(opcao);
         }
 
-        // Seleciona frete
+        // ===== SELECIONAR FRETE =====
         function selecionarFrete(opcao) {
-            console.log('Selecionando frete:', opcao);
+            console.log('=== SELECIONANDO FRETE ===');
+            console.log('Opção:', opcao);
 
             fetch('/frete/selecionar', {
                 method: 'POST',
@@ -1011,7 +1183,6 @@
                             el.classList.remove('selected');
                         });
 
-                        // Seleciona a opção clicada
                         const opcaoElement = document.querySelector(`.shipping-option[data-index="${opcoesFreteGlobal.indexOf(opcao)}"]`);
                         if (opcaoElement) {
                             opcaoElement.classList.add('selected');
@@ -1021,19 +1192,22 @@
                         atualizarResumo(data.valorFrete, data.valorTotal);
 
                         // Mostra notificação
-                        mostrarNotificacao(data.message, 'success');
+                        mostrarNotificacao('Frete selecionado: ' + opcao.nome, 'success');
                     } else {
-                        alert(data.message);
+                        mostrarNotificacao(data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Erro:', error);
-                    alert('Erro ao selecionar frete. Tente novamente.');
+                    mostrarNotificacao('Erro ao selecionar frete', 'error');
                 });
         }
 
-        // Atualiza resumo do pedido
+        // ===== ATUALIZAR RESUMO =====
         function atualizarResumo(valorFrete, valorTotal) {
+            console.log('=== ATUALIZANDO RESUMO ===');
+            console.log('Frete:', valorFrete, 'Total:', valorTotal);
+
             const freteRow = document.getElementById('freteRow');
             const freteValue = document.getElementById('freteValue');
             const totalValue = document.getElementById('totalValue');
@@ -1049,40 +1223,48 @@
             totalValue.textContent = 'R$ ' + parseFloat(valorTotal).toFixed(2).replace('.', ',');
         }
 
-        // ===== FUNÇÃO ATUALIZADA: Finaliza compra =====
+        // ===== FINALIZAR COMPRA =====
         function finalizarCompra() {
-            // VERIFICA SE O CLIENTE ESTÁ LOGADO
+            console.log('=== FINALIZANDO COMPRA ===');
+
+            // Verifica se cliente está logado
             if (!clienteLogado) {
-                // Cliente NÃO está logado - redireciona para login
                 if (confirm('Você precisa fazer login para finalizar a compra.\n\nDeseja fazer login agora?')) {
-                    // Salva a URL atual para retornar depois do login (opcional)
                     window.location.href = '/cliente/login';
                 }
                 return;
             }
 
-            // Cliente está logado - continua com a validação normal
-            if (!freteSelecionado) {
-                alert('Por favor, calcule e selecione uma opção de frete antes de finalizar a compra.');
-                document.getElementById('cepInput').focus();
+            // Verifica se endereço foi selecionado
+            if (!enderecoSelecionadoId) {
+                mostrarNotificacao('Por favor, selecione um endereço de entrega', 'error');
                 return;
             }
 
+            // Verifica se frete foi selecionado
+            if (!freteSelecionado) {
+                mostrarNotificacao('Por favor, aguarde o cálculo do frete', 'error');
+                return;
+            }
+
+            // Tudo OK - mostra mensagem de sucesso
+            const enderecoElement = document.querySelector(`[data-endereco-id="${enderecoSelecionadoId}"]`);
+            const enderecoApelido = enderecoElement.querySelector('.address-apelido').textContent;
+
             alert(`Compra finalizada!\n\n` +
-                `Endereço: ${cepConsultado.localidade} - ${cepConsultado.uf}\n` +
+                `Endereço: ${enderecoApelido}\n` +
                 `Frete: ${freteSelecionado.nome}\n` +
                 `Prazo: ${freteSelecionado.prazoFormatado}\n\n` +
                 `Funcionalidade de pagamento em desenvolvimento!`);
         }
 
-        // Incrementa quantidade
+        // ===== CONTROLES DE QUANTIDADE =====
         function incrementQty(produtoId) {
             const input = document.getElementById('qty-' + produtoId);
             input.value = parseInt(input.value) + 1;
             document.getElementById('btnUpdate-' + produtoId).click();
         }
 
-        // Decrementa quantidade
         function decrementQty(produtoId) {
             const input = document.getElementById('qty-' + produtoId);
             const currentValue = parseInt(input.value);
@@ -1092,7 +1274,7 @@
             }
         }
 
-        // Mostra notificação temporária
+        // ===== NOTIFICAÇÕES =====
         function mostrarNotificacao(mensagem, tipo) {
             const notificacao = document.createElement('div');
             notificacao.className = 'alert alert-' + tipo;
@@ -1115,19 +1297,6 @@
                 }, 500);
             }, 3000);
         }
-
-        // Permite Enter no campo CEP
-        document.addEventListener('DOMContentLoaded', function () {
-            const cepInput = document.getElementById('cepInput');
-            if (cepInput) {
-                cepInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        calcularFrete();
-                    }
-                });
-            }
-        });
     </script>
 </body>
 

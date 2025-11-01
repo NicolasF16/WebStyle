@@ -48,7 +48,8 @@ public class Cliente {
     @Column(nullable = false)
     private Status status;
     
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    // CORREÇÃO PRINCIPAL: Mudei de LAZY para EAGER para garantir que os endereços sejam sempre carregados
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Endereco> enderecos = new ArrayList<>();
     
     public enum Status {

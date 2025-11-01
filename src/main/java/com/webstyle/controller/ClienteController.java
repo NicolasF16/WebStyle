@@ -44,6 +44,8 @@ public class ClienteController {
     /**
      * Processa login do cliente
      * URL: POST /cliente/login
+     * 
+     * CORREÇÃO: Recarrega o cliente do banco para garantir que os endereços sejam carregados
      */
     @PostMapping("/login")
     public String login(@RequestParam String email,
@@ -56,8 +58,23 @@ public class ClienteController {
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
             
-            // Salva cliente na sessão
-            session.setAttribute("clienteLogado", cliente);
+            // CORREÇÃO: Recarrega o cliente do banco para garantir que os endereços sejam carregados
+            Cliente clienteCompleto = clienteService.buscarPorId(cliente.getId());
+            
+            if (clienteCompleto == null) {
+                model.addAttribute("erro", "Erro ao carregar dados do usuário. Tente novamente.");
+                model.addAttribute("email", email);
+                return "cliente-login";
+            }
+            
+            // Salva cliente COMPLETO na sessão
+            session.setAttribute("clienteLogado", clienteCompleto);
+            
+            // Debug: Log para verificar endereços
+            System.out.println("=== LOGIN REALIZADO ===");
+            System.out.println("Cliente: " + clienteCompleto.getNomeCompleto());
+            System.out.println("Total de endereços: " + clienteCompleto.getEnderecos().size());
+            System.out.println("Endereços de entrega: " + clienteCompleto.getEnderecosEntrega().size());
             
             // Redireciona para a home
             return "redirect:/home";
@@ -87,7 +104,7 @@ public class ClienteController {
      * Processa cadastro do cliente
      * URL: POST /cliente/cadastro
      * 
-     * ALTERAÇÃO: Agora redireciona para a tela de login após cadastro bem-sucedido
+     * CORREÇÃO: Redireciona para a tela de login após cadastro bem-sucedido
      */
     @PostMapping("/cadastro")
     public String cadastrar(@RequestParam String nomeCompleto,
@@ -181,19 +198,32 @@ public class ClienteController {
             
             cliente.addEndereco(enderecoEntrega);
             
+            // CORREÇÃO: Log para debug
+            System.out.println("=== CADASTRANDO CLIENTE ===");
+            System.out.println("Nome: " + cliente.getNomeCompleto());
+            System.out.println("Total de endereços sendo cadastrados: " + cliente.getEnderecos().size());
+            System.out.println("Endereço de faturamento: " + enderecoFaturamento.getCidade());
+            System.out.println("Endereço de entrega: " + enderecoEntrega.getCidade());
+            
             // Cadastra o cliente
             Cliente clienteCadastrado = clienteService.cadastrarCliente(cliente);
             
-            // ===== ALTERAÇÃO PRINCIPAL =====
+            // CORREÇÃO: Verifica se os endereços foram salvos
+            System.out.println("=== CLIENTE CADASTRADO ===");
+            System.out.println("ID: " + clienteCadastrado.getId());
+            System.out.println("Total de endereços salvos: " + clienteCadastrado.getEnderecos().size());
+            
             // Redireciona para a tela de login com mensagem de sucesso
             redirectAttributes.addFlashAttribute("sucesso", 
                 "Cadastro realizado com sucesso, " + clienteCadastrado.getNomeCompleto() + "! " +
                 "Agora você pode fazer login com seu e-mail e senha.");
             
             return "redirect:/cliente/login";
-            // ===== FIM DA ALTERAÇÃO =====
             
         } catch (Exception e) {
+            System.err.println("ERRO NO CADASTRO: " + e.getMessage());
+            e.printStackTrace();
+            
             model.addAttribute("erro", e.getMessage());
             
             // Mantém os dados preenchidos no formulário
@@ -220,6 +250,8 @@ public class ClienteController {
     /**
      * Exibe página de edição de perfil
      * URL: GET /cliente/perfil
+     * 
+     * CORREÇÃO: Sempre recarrega os dados do banco
      */
     @GetMapping("/perfil")
     public String perfilForm(HttpSession session, Model model) {
@@ -229,12 +261,21 @@ public class ClienteController {
             return "redirect:/cliente/login";
         }
         
-        // Recarrega os dados do banco para garantir que estão atualizados
+        // CORREÇÃO: Sempre recarrega os dados do banco para garantir que estão atualizados
         Cliente cliente = clienteService.buscarPorId(clienteLogado.getId());
         if (cliente == null) {
             session.removeAttribute("clienteLogado");
             return "redirect:/cliente/login";
         }
+        
+        // Debug: Log para verificar endereços
+        System.out.println("=== VISUALIZANDO PERFIL ===");
+        System.out.println("Cliente: " + cliente.getNomeCompleto());
+        System.out.println("Total de endereços: " + cliente.getEnderecos().size());
+        System.out.println("Endereços de entrega: " + cliente.getEnderecosEntrega().size());
+        
+        // CORREÇÃO: Atualiza a sessão com os dados recarregados
+        session.setAttribute("clienteLogado", cliente);
         
         model.addAttribute("cliente", cliente);
         return "cliente-perfil";
