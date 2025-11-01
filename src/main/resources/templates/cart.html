@@ -5,6 +5,7 @@
     <title>Carrinho de Compras - WebStyle</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ESTILOS MANTIDOS IGUAIS - Omitidos aqui para brevidade -->
     <style>
         * {
             margin: 0;
@@ -657,19 +658,19 @@
         }
 
         .endereco-padrao-info {
-        animation: slideDown 0.5s ease-out;
-    }
+            animation: slideDown 0.5s ease-out;
+        }
 
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
     </style>
 </head>
 
@@ -839,22 +840,28 @@
     </div>
 
     <script th:inline="javascript">
+        // ===== VARIÁVEL PARA VERIFICAR SE O CLIENTE ESTÁ LOGADO =====
+        /*<![CDATA[*/
+        const clienteLogado = /*[[${session.clienteLogado != null}]]*/ false;
+        /*]]>*/
+
         // Se há endereço padrão pré-carregado, calcula o frete automaticamente
-    document.addEventListener('DOMContentLoaded', function() {
-        const cepPadrao = /*[[${cepPadrao}]]*/ null;
-        
-        if (cepPadrao && cepPadrao.trim() !== '') {
-            console.log('Carregando frete para CEP padrão:', cepPadrao);
+        document.addEventListener('DOMContentLoaded', function() {
+            const cepPadrao = /*[[${cepPadrao}]]*/ null;
             
-            // Aguarda um pouco e depois calcula o frete automaticamente
-            setTimeout(function() {
-                const cepInput = document.getElementById('cepInput');
-                if (cepInput && cepInput.value.trim() !== '') {
-                    calcularFrete();
-                }
-            }, 500);
-        }
-    });
+            if (cepPadrao && cepPadrao.trim() !== '') {
+                console.log('Carregando frete para CEP padrão:', cepPadrao);
+                
+                // Aguarda um pouco e depois calcula o frete automaticamente
+                setTimeout(function() {
+                    const cepInput = document.getElementById('cepInput');
+                    if (cepInput && cepInput.value.trim() !== '') {
+                        calcularFrete();
+                    }
+                }, 500);
+            }
+        });
+
         /*<![CDATA[*/
         const subtotalOriginal = /*[[${cartTotal}]]*/ 0;
         let freteSelecionado = null;
@@ -1042,8 +1049,19 @@
             totalValue.textContent = 'R$ ' + parseFloat(valorTotal).toFixed(2).replace('.', ',');
         }
 
-        // Finaliza compra
+        // ===== FUNÇÃO ATUALIZADA: Finaliza compra =====
         function finalizarCompra() {
+            // VERIFICA SE O CLIENTE ESTÁ LOGADO
+            if (!clienteLogado) {
+                // Cliente NÃO está logado - redireciona para login
+                if (confirm('Você precisa fazer login para finalizar a compra.\n\nDeseja fazer login agora?')) {
+                    // Salva a URL atual para retornar depois do login (opcional)
+                    window.location.href = '/cliente/login';
+                }
+                return;
+            }
+
+            // Cliente está logado - continua com a validação normal
             if (!freteSelecionado) {
                 alert('Por favor, calcule e selecione uma opção de frete antes de finalizar a compra.');
                 document.getElementById('cepInput').focus();
