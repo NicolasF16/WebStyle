@@ -40,7 +40,7 @@ public class PedidoController {
         model.addAttribute("pedidos", pedidos);
         model.addAttribute("cliente", clienteLogado);
         
-        return "pedidos-lista";
+        return "pedido-lista";
     }
     
     /**
