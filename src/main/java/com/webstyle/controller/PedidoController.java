@@ -55,7 +55,7 @@ public class PedidoController {
             return "redirect:/cliente/login";
         }
         
-        Pedido pedido = pedidoService.buscarPorId(id);
+        Pedido pedido = pedidoService.buscarPorIdComItens(id);
         
         if (pedido == null) {
             return "redirect:/pedidos";
@@ -65,6 +65,33 @@ public class PedidoController {
         if (!pedido.getCliente().getId().equals(clienteLogado.getId())) {
             return "redirect:/pedidos";
         }
+        
+        // Debug: Log para verificar os itens
+        System.out.println("=== DETALHES DO PEDIDO ===");
+        System.out.println("Pedido ID: " + pedido.getId());
+        System.out.println("Pedido Numero: " + pedido.getNumeroPedido());
+        System.out.println("Total de itens: " + (pedido.getItens() != null ? pedido.getItens().size() : "NULL"));
+        System.out.println("Status: " + pedido.getStatus());
+        System.out.println("Valor Total: " + pedido.getValorTotal());
+        System.out.println("Cliente: " + pedido.getCliente().getNomeCompleto());
+        System.out.println("Endereco Completo: " + pedido.getEnderecoEntregaCompleto());
+        
+        if (pedido.getItens() != null && !pedido.getItens().isEmpty()) {
+            System.out.println("\n--- ITENS DO PEDIDO ---");
+            for (int i = 0; i < pedido.getItens().size(); i++) {
+                var item = pedido.getItens().get(i);
+                System.out.println("Item " + (i+1) + ":");
+                System.out.println("  - Nome: " + item.getNomeProduto());
+                System.out.println("  - Codigo: " + item.getCodigoProduto());
+                System.out.println("  - Quantidade: " + item.getQuantidade());
+                System.out.println("  - Preco Unit: " + item.getPrecoUnitario());
+                System.out.println("  - Subtotal: " + item.getSubtotal());
+                System.out.println("  - Imagem: " + item.getImagemProduto());
+            }
+        } else {
+            System.out.println("\n!!! AVISO: Nenhum item encontrado no pedido !!!");
+        }
+        System.out.println("=========================\n");
         
         model.addAttribute("pedido", pedido);
         model.addAttribute("cliente", clienteLogado);

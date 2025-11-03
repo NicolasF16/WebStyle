@@ -149,6 +149,24 @@ public class PedidoService {
     }
     
     /**
+     * Busca pedido por ID carregando todos os itens (EAGER)
+     * Este método força o carregamento dos itens antes de fechar a transação
+     */
+    public Pedido buscarPorIdComItens(Long id) {
+        Pedido pedido = pedidoRepository.findById(id).orElse(null);
+        
+        if (pedido != null) {
+            // Força o carregamento dos itens do pedido
+            pedido.getItens().size();
+            
+            // Também força o carregamento do cliente
+            pedido.getCliente().getNomeCompleto();
+        }
+        
+        return pedido;
+    }
+    
+    /**
      * Lista pedidos do cliente
      */
     public List<Pedido> listarPedidosCliente(Long clienteId) {

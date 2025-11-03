@@ -76,7 +76,8 @@ public class Pedido {
     @Column(nullable = false)
     private String prazoEntrega;
     
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    // CORREÇÃO: Mudado para EAGER para carregar os itens automaticamente
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ItemPedido> itens = new ArrayList<>();
     
     public enum StatusPedido {
