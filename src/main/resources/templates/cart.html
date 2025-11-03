@@ -2269,27 +2269,111 @@
         }
 
         function concluirCompra() {
-            const btnConcluir = document.getElementById('btnConcluirCompra');
-            btnConcluir.disabled = true;
-            btnConcluir.innerHTML = '⏳ Processando...';
-            
-            // Simula processamento
-            setTimeout(() => {
-                fecharModalResumo();
-                
-                // Limpa o carrinho
-                fetch('/carrinho/limpar', {
-                    method: 'POST'
-                }).then(() => {
-                    mostrarNotificacao('🎉 Pedido realizado com sucesso! Em breve você receberá um e-mail com os detalhes.', 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = '/home';
-                    }, 3000);
-                });
-            }, 2000);
+    const btnConcluir = document.getElementById('btnConcluirCompra');
+    btnConcluir.disabled = true;
+    btnConcluir.innerHTML = '⏳ Processando...';
+    
+    // Coleta os dados necessários
+    const valorFrete = freteSelecionado.valor;
+    const valorTotal = parseFloat(document.getElementById('totalValue').textContent.replace('R$ ', '').replace(',', '.'));
+    
+    // Prepara os dados do pedido
+    const formData = new URLSearchParams();
+    formData.append('enderecoId', enderecoSelecionadoId);
+    formData.append('tipoFrete', freteSelecionado.tipo);
+    formData.append('nomeFrete', freteSelecionado.nome);
+    formData.append('prazoEntrega', freteSelecionado.prazoFormatado);
+    formData.append('valorFrete', valorFrete);
+    formData.append('formaPagamento', dadosPagamento.tipo);
+    
+    if (dadosPagamento.tipo === 'cartao') {
+        formData.append('numeroParcelas', dadosPagamento.parcelas);
+    }
+    
+    // Envia a requisição
+    fetch('/carrinho/finalizar-pedido', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString()
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            fecharModalResumo();
+            mostrarModalPedidoConcluido(data);
+        } else {
+            mostrarNotificacao(data.message, 'error');
+            btnConcluir.disabled = false;
+            btnConcluir.innerHTML = '✅ Confirmar Pedido';
         }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro ao processar pedido. Tente novamente.', 'error');
+        btnConcluir.disabled = false;
+        btnConcluir.innerHTML = '✅ Confirmar Pedido';
+    });
+}
 
+// Nova função para mostrar modal de pedido concluído
+function mostrarModalPedidoConcluido(data) {
+    // Cria o modal
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.style.zIndex = '20000';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+            
+            <h2 style="font-size: 32px; color: #10b981; margin-bottom: 15px; font-weight: 800;">
+                Pedido Realizado com Sucesso!
+            </h2>
+            
+            <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+                <p style="font-size: 14px; color: #6b7280; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+                    Número do Pedido
+                </p>
+                <p style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 15px; font-family: monospace;">
+                    ${data.numeroPedido}
+                </p>
+                <p style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">
+                    📅 ${data.dataPedido}
+                </p>
+                <p style="font-size: 20px; font-weight: 700; color: #10b981; margin-top: 15px;">
+                    💰 R$ ${parseFloat(data.valorTotal).toFixed(2).replace('.', ',')}
+                </p>
+            </div>
+            
+            <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.6;">
+                Seu pedido foi registrado e está aguardando confirmação de pagamento.<br>
+                Em breve você receberá um e-mail com todos os detalhes.
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button onclick="verMeusPedidos()" class="btn btn-success" style="width: 100%; padding: 15px; font-size: 16px;">
+                    📦 Ver Meus Pedidos
+                </button>
+                <button onclick="voltarParaHome()" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px;">
+                    🏠 Voltar para Tela Inicial
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function verMeusPedidos() {
+    window.location.href = '/pedidos';
+}
+
+function voltarParaHome() {
+    window.location.href = '/home';
+}
         // ===== CONTROLES DE QUANTIDADE =====
         function incrementQty(produtoId) {
             const input = document.getElementById('qty-' + produtoId);

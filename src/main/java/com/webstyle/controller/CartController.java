@@ -3,8 +3,10 @@ package com.webstyle.controller;
 import com.webstyle.model.CartItem;
 import com.webstyle.model.Cliente;
 import com.webstyle.model.Endereco;
+import com.webstyle.model.Pedido;
 import com.webstyle.service.CartService;
 import com.webstyle.service.ClienteService;
+import com.webstyle.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +34,9 @@ public class CartController {
     
     @Autowired
     private ClienteService clienteService;
+    
+    @Autowired
+    private PedidoService pedidoService;
     
     /**
      * Exibe a página do carrinho
@@ -210,5 +216,95 @@ public class CartController {
             "Total: R$ " + cartService.getCartTotal());
         
         return "redirect:/carrinho";
+    }
+    
+    /**
+     * Finaliza a compra criando um pedido
+     * URL: POST /carrinho/finalizar-pedido
+     */
+    @PostMapping("/finalizar-pedido")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> finalizarPedido(
+            @RequestParam Long enderecoId,
+            @RequestParam String tipoFrete,
+            @RequestParam String nomeFrete,
+            @RequestParam String prazoEntrega,
+            @RequestParam BigDecimal valorFrete,
+            @RequestParam String formaPagamento,
+            @RequestParam(required = false) Integer numeroParcelas,
+            HttpSession session) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            System.out.println("=== FINALIZANDO PEDIDO ===");
+            
+            // Verifica se cliente está logado
+            Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+            if (clienteLogado == null) {
+                response.put("success", false);
+                response.put("message", "Você precisa estar logado para finalizar a compra");
+                return ResponseEntity.status(401).body(response);
+            }
+            
+            // Obtém itens do carrinho
+            List<CartItem> cartItems = cartService.getCart();
+            if (cartItems.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Carrinho vazio");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Calcula valores
+            BigDecimal valorSubtotal = cartService.getCartTotal();
+            
+            System.out.println("Endereço ID: " + enderecoId);
+            System.out.println("Tipo Frete: " + tipoFrete);
+            System.out.println("Valor Subtotal: " + valorSubtotal);
+            System.out.println("Valor Frete: " + valorFrete);
+            System.out.println("Forma Pagamento: " + formaPagamento);
+            
+            // Cria o pedido
+            Pedido pedido = pedidoService.criarPedido(
+                clienteLogado,
+                cartItems,
+                enderecoId,
+                valorSubtotal,
+                valorFrete,
+                tipoFrete,
+                nomeFrete,
+                prazoEntrega,
+                formaPagamento,
+                numeroParcelas
+            );
+            
+            System.out.println("Pedido criado: " + pedido.getNumeroPedido());
+            
+            // Limpa o carrinho
+            cartService.clearCart();
+            
+            // Limpa informações de frete da sessão
+            session.removeAttribute("cepDestino");
+            session.removeAttribute("opcoesFrete");
+            session.removeAttribute("freteSelecionado");
+            
+            // Prepara resposta
+            response.put("success", true);
+            response.put("message", "Pedido realizado com sucesso!");
+            response.put("numeroPedido", pedido.getNumeroPedido());
+            response.put("valorTotal", pedido.getValorTotal());
+            response.put("dataPedido", pedido.getDataPedido().format(
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+            ));
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            System.err.println("ERRO ao finalizar pedido: " + e.getMessage());
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Erro ao finalizar pedido: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }

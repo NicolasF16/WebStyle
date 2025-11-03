@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Meus Pedidos - WebStyle</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .pedidos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .pedido-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .pedido-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .pedido-info {
+            flex: 1;
+        }
+
+        .pedido-numero {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+
+        .pedido-data {
+            font-size: 14px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pedido-status {
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-aguardando {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-confirmado {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-separacao {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-transporte {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .status-entregue {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .pedido-valor {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 8px;
+        }
+
+        .pedido-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pedido-detalhe {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .detalhe-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .detalhe-valor {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .pedido-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-detalhes {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: inline-block;
+        }
+
+        .btn-detalhes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 20px;
+            padding: 80px 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h2 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .btn-comprar {
+            display: inline-block;
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-comprar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .pedido-card {
+                padding: 20px;
+            }
+
+            .pedido-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .pedido-status {
+                text-align: left;
+            }
+
+            .pedido-body {
+                grid-template-columns: 1fr;
+            }
+
+            .pedido-numero {
+                font-size: 20px;
+            }
+
+            .pedido-valor {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-actions">
+            <a href="/home" class="btn-back">
+                ← Voltar para a Loja
+            </a>
+            <a href="/cliente/perfil" class="btn-back">
+                👤 Meu Perfil
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">📦 Meus Pedidos</h1>
+            <p class="page-subtitle">Acompanhe o status de todos os seus pedidos</p>
+        </div>
+
+        <!-- Lista de Pedidos -->
+        <div class="pedidos-list" th:if="${pedidos != null and !pedidos.isEmpty()}">
+            <div class="pedido-card" th:each="pedido : ${pedidos}">
+                <div class="pedido-header">
+                    <div class="pedido-info">
+                        <div class="pedido-numero" th:text="'#' + ${pedido.numeroPedido}"></div>
+                        <div class="pedido-data">
+                            📅 <span th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                    <div class="pedido-status">
+                        <div class="status-badge"
+                             th:classappend="${pedido.status.name() == 'AGUARDANDO_PAGAMENTO'} ? 'status-aguardando' : 
+                                           (${pedido.status.name() == 'PAGAMENTO_CONFIRMADO'} ? 'status-confirmado' : 
+                                           (${pedido.status.name() == 'EM_SEPARACAO'} ? 'status-separacao' : 
+                                           (${pedido.status.name() == 'EM_TRANSPORTE'} ? 'status-transporte' : 
+                                           (${pedido.status.name() == 'ENTREGUE'} ? 'status-entregue' : 'status-cancelado'))))"
+                             th:text="${pedido.status.descricao}">
+                        </div>
+                        <div class="pedido-valor">
+                            R$ <span th:text="${#numbers.formatDecimal(pedido.valorTotal, 1, 2)}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pedido-body">
+                    <div class="pedido-detalhe">
+                        <div class="detalhe-label">💳 Pagamento</div>
+                        <div class="detalhe-valor" th:text="${pedido.formaPagamento.descricao}"></div>
+                    </div>
+                    <div class="pedido-detalhe">
+                        <div class="detalhe-label">📦 Itens</div>
+                        <div class="detalhe-valor" th:text="${pedido.itens.size()} + ' produto(s)'"></div>
+                    </div>
+                    <div class="pedido-detalhe">
+                        <div class="detalhe-label">🚚 Frete</div>
+                        <div class="detalhe-valor" th:text="${pedido.nomeFrete}"></div>
+                    </div>
+                    <div class="pedido-detalhe">
+                        <div class="detalhe-label">⏱️ Prazo</div>
+                        <div class="detalhe-valor" th:text="${pedido.prazoEntrega}"></div>
+                    </div>
+                </div>
+
+                <div class="pedido-actions">
+                    <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="btn-detalhes">
+                        🔍 Ver Detalhes Completos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado Vazio -->
+        <div class="empty-state" th:if="${pedidos == null or pedidos.isEmpty()}">
+            <div class="empty-icon">📦</div>
+            <h2>Nenhum pedido encontrado</h2>
+            <p>Você ainda não realizou nenhum pedido em nossa loja.</p>
+            <a href="/home" class="btn-comprar">🛍️ Começar a Comprar</a>
+        </div>
+    </div>
+</body>
+</html>

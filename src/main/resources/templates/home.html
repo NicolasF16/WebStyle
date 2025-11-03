@@ -728,15 +728,15 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/carrinho">
-                                    <span class="dropdown-menu-icon">🛒</span>
-                                    <span>Meu Carrinho</span>
+                                <a href="/pedidos">
+                                    <span class="dropdown-menu-icon">📦</span>
+                                    <span>Meus Pedidos</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#" onclick="alert('Funcionalidade em desenvolvimento'); return false;">
-                                    <span class="dropdown-menu-icon">📦</span>
-                                    <span>Meus Pedidos</span>
+                                <a href="/carrinho">
+                                    <span class="dropdown-menu-icon">🛒</span>
+                                    <span>Meu Carrinho</span>
                                 </a>
                             </li>
                             <li>
@@ -959,18 +959,18 @@
     </script>
 
     <script>
-    function confirmarLogout(event) {
-        event.preventDefault();
-        
-        const confirmacao = confirm('Tem certeza que deseja sair da sua conta?');
-        
-        if (confirmacao) {
-            window.location.href = event.target.href || event.currentTarget.href;
+        function confirmarLogout(event) {
+            event.preventDefault();
+
+            const confirmacao = confirm('Tem certeza que deseja sair da sua conta?');
+
+            if (confirmacao) {
+                window.location.href = event.target.href || event.currentTarget.href;
+            }
+
+            return false;
         }
-        
-        return false;
-    }
-</script>
+    </script>
 
 </body>
 
