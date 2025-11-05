@@ -49,6 +49,9 @@ public class Endereco {
     @Column(nullable = false)
     private boolean enderecoPadrao = false; // true = este é o endereço padrão para entrega
     
+    @Column(nullable = false)
+    private boolean ativo = true; // true = endereço ativo, false = endereço inativo
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
@@ -56,6 +59,7 @@ public class Endereco {
     public Endereco() {
         this.faturamento = false;
         this.enderecoPadrao = false;
+        this.ativo = true;
     }
     
     // Getters e Setters
@@ -145,6 +149,14 @@ public class Endereco {
     
     public void setEnderecoPadrao(boolean enderecoPadrao) {
         this.enderecoPadrao = enderecoPadrao;
+    }
+    
+    public boolean isAtivo() {
+        return ativo;
+    }
+    
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
     
     public Cliente getCliente() {

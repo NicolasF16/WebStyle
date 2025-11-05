@@ -279,6 +279,12 @@
             border-color: #10b981;
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
         }
+        
+        .endereco-item.inativo {
+            opacity: 0.6;
+            border-color: #9ca3af;
+            background: #f3f4f6;
+        }
 
         .endereco-header {
             display: flex;
@@ -312,6 +318,11 @@
 
         .badge-success {
             background: #10b981;
+            color: white;
+        }
+        
+        .badge-danger {
+            background: #ef4444;
             color: white;
         }
 
@@ -655,8 +666,8 @@
                 <!-- Lista de endereços -->
                 <div class="enderecos-list">
                     <div class="endereco-item" 
-                         th:each="endereco : ${cliente.enderecos}"
-                         th:classappend="${endereco.faturamento} ? 'faturamento' : (${endereco.enderecoPadrao} ? 'padrao' : '')">
+                         th:each="endereco : ${cliente.todosEnderecosEntrega}"
+                         th:classappend="${endereco.faturamento} ? 'faturamento' : (${endereco.enderecoPadrao} ? 'padrao' : '') + (${!endereco.ativo} ? ' inativo' : '')">
                         
                         <div class="endereco-header">
                             <div class="endereco-apelido">
@@ -665,6 +676,7 @@
                                 <span th:text="${endereco.faturamento ? 'Endereço de Faturamento' : endereco.apelido}">Apelido</span>
                                 <span th:if="${endereco.faturamento}" class="badge badge-primary">Padrão</span>
                                 <span th:if="${!endereco.faturamento && endereco.enderecoPadrao}" class="badge badge-success">★ Padrão</span>
+                                <span th:if="${!endereco.ativo}" class="badge badge-danger">❌ Inativo</span>
                             </div>
                         </div>
 
@@ -681,8 +693,8 @@
                         </div>
 
                         <div class="endereco-actions" th:unless="${endereco.faturamento}">
-                            <!-- Botão Definir como Padrão (só aparece se NÃO é padrão e há mais de um endereço de entrega) -->
-                            <form th:if="${!endereco.enderecoPadrao && cliente.getEnderecosEntrega().size() > 1}"
+                            <!-- Botão Definir como Padrão (só aparece se NÃO é padrão, está ativo e há mais de um endereço de entrega ativo) -->
+                            <form th:if="${!endereco.enderecoPadrao and endereco.ativo and cliente.enderecosEntrega.size() > 1}"
                                   th:action="@{/cliente/perfil/definir-endereco-padrao/{id}(id=${endereco.id})}" 
                                   method="post"
                                   style="display: inline;">
@@ -691,13 +703,14 @@
                                 </button>
                             </form>
 
-                            <!-- Botão Remover -->
-                            <form th:action="@{/cliente/perfil/remover-endereco/{id}(id=${endereco.id})}" 
+                            <!-- Botão Alternar Status -->
+                            <form th:action="@{/cliente/perfil/alternar-status-endereco/{id}(id=${endereco.id})}" 
                                   method="post"
-                                  onsubmit="return confirm('Tem certeza que deseja remover este endereço?')"
+                                  onsubmit="return confirm('Tem certeza que deseja ' + (${endereco.ativo} ? 'desativar' : 'ativar') + ' este endereço?')"
                                   style="display: inline;">
-                                <button type="submit" class="btn btn-danger btn-small">
-                                    🗑️ Remover
+                                <button type="submit" class="btn btn-small" th:class="${endereco.ativo} ? 'btn-danger' : 'btn-success'">
+                                    <span th:if="${endereco.ativo}">🚫 Desativar</span>
+                                    <span th:unless="${endereco.ativo}">✅ Ativar</span>
                                 </button>
                             </form>
                         </div>

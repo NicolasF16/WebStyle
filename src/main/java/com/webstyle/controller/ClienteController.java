@@ -402,11 +402,11 @@ public class ClienteController {
     }
     
     /**
-     * Remove endereço de entrega
-     * URL: POST /cliente/perfil/remover-endereco/{id}
+     * Alterna status do endereço de entrega (ativo/inativo)
+     * URL: POST /cliente/perfil/alternar-status-endereco/{id}
      */
-    @PostMapping("/perfil/remover-endereco/{enderecoId}")
-    public String removerEndereco(@PathVariable Long enderecoId,
+    @PostMapping("/perfil/alternar-status-endereco/{enderecoId}")
+    public String alternarStatusEndereco(@PathVariable Long enderecoId,
                                   HttpSession session,
                                   RedirectAttributes redirectAttributes) {
         
@@ -417,17 +417,17 @@ public class ClienteController {
         }
         
         try {
-            clienteService.removerEndereco(clienteLogado.getId(), enderecoId);
+            clienteService.alternarStatusEndereco(clienteLogado.getId(), enderecoId);
             
             // Atualiza a sessão
             Cliente clienteAtualizado = clienteService.buscarPorId(clienteLogado.getId());
             session.setAttribute("clienteLogado", clienteAtualizado);
             
-            redirectAttributes.addFlashAttribute("sucesso", "Endereço removido com sucesso!");
+            redirectAttributes.addFlashAttribute("sucesso", "Status do endereço atualizado com sucesso!");
             return "redirect:/cliente/perfil";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("erro", "Erro ao remover endereço: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("erro", "Erro ao alterar status do endereço: " + e.getMessage());
             return "redirect:/cliente/perfil";
         }
     }

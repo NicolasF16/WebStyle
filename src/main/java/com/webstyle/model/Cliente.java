@@ -164,6 +164,12 @@ public class Cliente {
     
     public List<Endereco> getEnderecosEntrega() {
         return enderecos.stream()
+                .filter(e -> !e.isFaturamento() && e.isAtivo())
+                .toList();
+    }
+    
+    public List<Endereco> getTodosEnderecosEntrega() {
+        return enderecos.stream()
                 .filter(e -> !e.isFaturamento())
                 .toList();
     }

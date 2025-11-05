@@ -201,9 +201,9 @@ public class ClienteService {
     }
     
     /**
-     * Remove endereço de entrega
+     * Alterna status do endereço de entrega (ativo/inativo)
      */
-    public void removerEndereco(Long clienteId, Long enderecoId) {
+    public void alternarStatusEndereco(Long clienteId, Long enderecoId) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
         
@@ -215,33 +215,50 @@ public class ClienteService {
             throw new RuntimeException("Endereço não pertence a este cliente");
         }
         
-        // Não permite remover endereço de faturamento
+        // Não permite desativar endereço de faturamento
         if (endereco.isFaturamento()) {
-            throw new RuntimeException("Não é possível remover o endereço de faturamento");
+            throw new RuntimeException("Não é possível desativar o endereço de faturamento");
         }
         
-        // Não permite remover o último endereço de entrega
-        long qtdEnderecosEntrega = cliente.getEnderecos().stream()
-                .filter(e -> !e.isFaturamento())
-                .count();
-        
-        if (qtdEnderecosEntrega <= 1) {
-            throw new RuntimeException("É necessário ter pelo menos um endereço de entrega cadastrado");
+        // Se está tentando desativar um endereço ativo
+        if (endereco.isAtivo()) {
+            // Não permite desativar o último endereço ativo de entrega
+            long qtdEnderecosAtivos = cliente.getEnderecos().stream()
+                    .filter(e -> !e.isFaturamento() && e.isAtivo())
+                    .count();
+            
+            if (qtdEnderecosAtivos <= 1) {
+                throw new RuntimeException("É necessário ter pelo menos um endereço de entrega ativo");
+            }
+            
+            // Se era o endereço padrão, define outro como padrão antes de desativar
+            if (endereco.isEnderecoPadrao()) {
+                cliente.getEnderecos().stream()
+                        .filter(e -> !e.isFaturamento() && e.isAtivo() && !e.getId().equals(enderecoId))
+                        .findFirst()
+                        .ifPresent(e -> {
+                            e.setEnderecoPadrao(true);
+                            enderecoRepository.save(e);
+                        });
+                
+                endereco.setEnderecoPadrao(false);
+            }
+            
+            endereco.setAtivo(false);
+        } else {
+            // Se está reativando um endereço
+            endereco.setAtivo(true);
+            
+            // Se não há nenhum endereço padrão ativo, define este como padrão
+            boolean temEnderecoPadrao = cliente.getEnderecos().stream()
+                    .anyMatch(e -> !e.isFaturamento() && e.isAtivo() && e.isEnderecoPadrao());
+            
+            if (!temEnderecoPadrao) {
+                endereco.setEnderecoPadrao(true);
+            }
         }
         
-        // Se era o endereço padrão, define outro como padrão
-        if (endereco.isEnderecoPadrao()) {
-            cliente.getEnderecos().stream()
-                    .filter(e -> !e.isFaturamento() && !e.getId().equals(enderecoId))
-                    .findFirst()
-                    .ifPresent(e -> {
-                        e.setEnderecoPadrao(true);
-                        enderecoRepository.save(e);
-                    });
-        }
-        
-        cliente.removeEndereco(endereco);
-        enderecoRepository.delete(endereco);
+        enderecoRepository.save(endereco);
     }
     
     /**
