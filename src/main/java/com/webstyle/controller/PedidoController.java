@@ -44,7 +44,7 @@ public class PedidoController {
     }
     
     /**
-     * Exibe detalhes de um pedido específico
+     * Exibe resumo de um pedido específico
      * URL: GET /pedidos/{id}
      */
     @GetMapping("/{id}")
@@ -97,5 +97,34 @@ public class PedidoController {
         model.addAttribute("cliente", clienteLogado);
         
         return "pedido-detalhes";
+    }
+    
+    /**
+     * Exibe detalhes completos de um pedido (nova página)
+     * URL: GET /pedidos/{id}/detalhes
+     */
+    @GetMapping("/{id}/detalhes")
+    public String detalhesCompletosPedido(@PathVariable Long id, HttpSession session, Model model) {
+        Cliente clienteLogado = (Cliente) session.getAttribute("clienteLogado");
+        
+        if (clienteLogado == null) {
+            return "redirect:/cliente/login";
+        }
+        
+        Pedido pedido = pedidoService.buscarPorIdComItens(id);
+        
+        if (pedido == null) {
+            return "redirect:/pedidos";
+        }
+        
+        // Verifica se o pedido pertence ao cliente logado
+        if (!pedido.getCliente().getId().equals(clienteLogado.getId())) {
+            return "redirect:/pedidos";
+        }
+        
+        model.addAttribute("pedido", pedido);
+        model.addAttribute("cliente", clienteLogado);
+        
+        return "pedido-detalhes-completo";
     }
 }

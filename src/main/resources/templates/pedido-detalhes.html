@@ -90,35 +90,12 @@
             letter-spacing: 1px;
         }
 
-        .status-aguardando {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-confirmado {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-separacao {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-
-        .status-transporte {
-            background: #ddd6fe;
-            color: #5b21b6;
-        }
-
-        .status-entregue {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-cancelado {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        .status-aguardando { background: #fef3c7; color: #92400e; }
+        .status-confirmado { background: #dbeafe; color: #1e40af; }
+        .status-separacao { background: #e0e7ff; color: #3730a3; }
+        .status-transporte { background: #ddd6fe; color: #5b21b6; }
+        .status-entregue { background: #d1fae5; color: #065f46; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; }
 
         .content-grid {
             display: grid;
@@ -156,9 +133,7 @@
             margin-bottom: 15px;
         }
 
-        .item-produto:last-child {
-            margin-bottom: 0;
-        }
+        .item-produto:last-child { margin-bottom: 0; }
 
         .item-imagem {
             width: 100px;
@@ -185,9 +160,7 @@
             color: #9ca3af;
         }
 
-        .item-info {
-            flex: 1;
-        }
+        .item-info { flex: 1; }
 
         .item-nome {
             font-size: 16px;
@@ -215,38 +188,6 @@
             font-weight: 700;
             color: #667eea;
             margin-top: 10px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        .info-value {
-            font-size: 14px;
-            color: #1f2937;
-            font-weight: 600;
-            text-align: right;
-        }
-
-        .endereco-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #4b5563;
-            line-height: 1.8;
         }
 
         .resumo-valores {
@@ -277,51 +218,45 @@
             background-clip: text;
         }
 
-        .valor-label {
-            color: #6b7280;
+        .valor-label { color: #6b7280; }
+        .valor-value { color: #1f2937; font-weight: 700; }
+
+        /* Botão Ver Detalhes */
+        .btn-ver-detalhes {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 20px;
         }
 
-        .valor-value {
-            color: #1f2937;
-            font-weight: 700;
+        .btn-ver-detalhes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
         }
 
         @media (max-width: 1024px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
+            .content-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .page-header {
-                padding: 20px;
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .section-card {
-                padding: 20px;
-            }
-
-            .item-produto {
-                flex-direction: column;
-            }
-
-            .item-imagem {
-                width: 100%;
-                height: 200px;
-            }
-
-            .page-title {
-                font-size: 24px;
-            }
+            body { padding: 10px; }
+            .page-header { padding: 20px; }
+            .header-content { flex-direction: column; gap: 15px; }
+            .section-card { padding: 20px; }
+            .item-produto { flex-direction: column; }
+            .item-imagem { width: 100%; height: 200px; }
+            .page-title { font-size: 24px; }
         }
     </style>
 </head>
@@ -329,12 +264,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header-actions">
-            <a href="/pedidos" class="btn-back">
-                ← Voltar para Meus Pedidos
-            </a>
-            <a href="/home" class="btn-back">
-                🏠 Voltar para Loja
-            </a>
+            <a href="/pedidos" class="btn-back">← Voltar para Meus Pedidos</a>
+            <a href="/home" class="btn-back">🏠 Voltar para Loja</a>
         </div>
 
         <div class="content-grid" th:if="${pedido != null}">
@@ -369,7 +300,6 @@
                         <p style="color: #6b7280; text-align: center; padding: 20px;">Nenhum item encontrado neste pedido.</p>
                     </div>
                 </div>
-
             </div>
 
             <!-- Coluna Lateral -->
@@ -402,8 +332,12 @@
                             </span>
                         </div>
                     </div>
-                </div>
 
+                    <!-- Botão Ver Detalhes do Pedido -->
+                    <a th:href="@{/pedidos/{id}/detalhes(id=${pedido.id})}" class="btn-ver-detalhes">
+                        📋 Ver Detalhes do Pedido
+                    </a>
+                </div>
             </div>
         </div>
 
