@@ -359,28 +359,28 @@
                     </div>
                 </div>
 
-                <div class="pedido-body">
+                                <div class="pedido-body">
                     <div class="pedido-detalhe">
-                        <div class="detalhe-label">💳 Pagamento</div>
-                        <div class="detalhe-valor" th:text="${pedido.formaPagamento.descricao}"></div>
+                        <div class="detalhe-label">🔢 ID do Pedido</div>
+                        <div class="detalhe-valor" th:text="${pedido.id}"></div>
                     </div>
                     <div class="pedido-detalhe">
-                        <div class="detalhe-label">📦 Itens</div>
-                        <div class="detalhe-valor" th:text="${pedido.itens.size()} + ' produto(s)'"></div>
+                        <div class="detalhe-label">📅 Data do Pedido</div>
+                        <div class="detalhe-valor" th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}"></div>
                     </div>
                     <div class="pedido-detalhe">
-                        <div class="detalhe-label">🚚 Frete</div>
-                        <div class="detalhe-valor" th:text="${pedido.nomeFrete}"></div>
+                        <div class="detalhe-label">💰 Valor Total</div>
+                        <div class="detalhe-valor" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal, 1, 2)}"></div>
                     </div>
                     <div class="pedido-detalhe">
-                        <div class="detalhe-label">⏱️ Prazo</div>
-                        <div class="detalhe-valor" th:text="${pedido.prazoEntrega}"></div>
+                        <div class="detalhe-label">📊 Status</div>
+                        <div class="detalhe-valor" th:text="${pedido.status.descricao}"></div>
                     </div>
                 </div>
 
                 <div class="pedido-actions">
                     <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="btn-detalhes">
-                        🔍 Ver Detalhes Completos
+                        🔍 Ver Resumo do Pedido
                     </a>
                 </div>
             </div>

@@ -337,28 +337,6 @@
             </a>
         </div>
 
-        <!-- Page Header -->
-        <div class="page-header" th:if="${pedido != null}">
-            <div class="header-content">
-                <div class="header-info">
-                    <h1 class="page-title" th:text="'Pedido #' + ${pedido.numeroPedido}">Pedido #202411000001</h1>
-                    <p class="page-subtitle" 
-                       th:text="'Realizado em ' + ${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy')} + ' às ' + ${#temporals.format(pedido.dataPedido, 'HH:mm')}">
-                       Realizado em 01/11/2024 às 14:30
-                    </p>
-                </div>
-                <div class="status-badge"
-                     th:class="'status-badge ' + ${pedido.status?.name() == 'AGUARDANDO_PAGAMENTO' ? 'status-aguardando' : 
-                                   (pedido.status?.name() == 'PAGAMENTO_CONFIRMADO' ? 'status-confirmado' : 
-                                   (pedido.status?.name() == 'EM_SEPARACAO' ? 'status-separacao' : 
-                                   (pedido.status?.name() == 'EM_TRANSPORTE' ? 'status-transporte' : 
-                                   (pedido.status?.name() == 'ENTREGUE' ? 'status-entregue' : 'status-cancelado'))))}"
-                     th:text="${pedido.status?.descricao}">
-                    Aguardando Pagamento
-                </div>
-            </div>
-        </div>
-
         <div class="content-grid" th:if="${pedido != null}">
             <!-- Coluna Principal -->
             <div>
@@ -392,34 +370,6 @@
                     </div>
                 </div>
 
-                <!-- Endereço de Entrega -->
-                <div class="section-card" th:if="${pedido.enderecoEntregaCompleto != null}">
-                    <h2 class="section-title">📍 Endereço de Entrega</h2>
-                    <div class="endereco-box" th:text="${pedido.enderecoEntregaCompleto}">Endereço de entrega</div>
-                </div>
-
-                <!-- Informações de Entrega -->
-                <div class="section-card">
-                    <h2 class="section-title">🚚 Informações de Entrega</h2>
-                    <div class="info-row">
-                        <span class="info-label">Tipo de Frete:</span>
-                        <span class="info-value" th:text="${pedido.nomeFrete} ?: 'Não informado'">PAC</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Prazo de Entrega:</span>
-                        <span class="info-value" th:text="${pedido.prazoEntrega} ?: 'Não informado'">5 dias úteis</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Valor do Frete:</span>
-                        <span class="info-value">
-                            <span th:if="${pedido.valorFrete != null and pedido.valorFrete > 0}" 
-                                  th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorFrete, 1, 2)}">R$ 15,00</span>
-                            <span th:if="${pedido.valorFrete != null and pedido.valorFrete == 0}" 
-                                  style="color: #10b981; font-weight: 700;">GRÁTIS 🎉</span>
-                            <span th:if="${pedido.valorFrete == null}">Não informado</span>
-                        </span>
-                    </div>
-                </div>
             </div>
 
             <!-- Coluna Lateral -->
@@ -454,22 +404,6 @@
                     </div>
                 </div>
 
-                <!-- Forma de Pagamento -->
-                <div class="section-card">
-                    <h2 class="section-title">💳 Pagamento</h2>
-                    <div class="info-row">
-                        <span class="info-label">Forma:</span>
-                        <span class="info-value" th:text="${pedido.formaPagamento?.descricao} ?: 'Não informado'">Cartão de Crédito</span>
-                    </div>
-                    <div class="info-row" 
-                         th:if="${pedido.formaPagamento?.name() == 'CARTAO_CREDITO' and pedido.numeroParcelas != null and pedido.numeroParcelas > 0 and pedido.valorTotal != null}">
-                        <span class="info-label">Parcelas:</span>
-                        <span class="info-value" 
-                              th:text="${pedido.numeroParcelas} + 'x de R$ ' + ${#numbers.formatDecimal(pedido.valorTotal.divide(new java.math.BigDecimal(pedido.numeroParcelas), 2, java.math.RoundingMode.HALF_UP), 1, 2)}">
-                              3x de R$ 38,30
-                        </span>
-                    </div>
-                </div>
             </div>
         </div>
 
