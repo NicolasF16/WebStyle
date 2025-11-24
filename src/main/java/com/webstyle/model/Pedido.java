@@ -76,17 +76,16 @@ public class Pedido {
     @Column(nullable = false)
     private String prazoEntrega;
     
-    // CORREÇÃO: Mudado para EAGER para carregar os itens automaticamente
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ItemPedido> itens = new ArrayList<>();
     
     public enum StatusPedido {
         AGUARDANDO_PAGAMENTO("Aguardando Pagamento"),
-        PAGAMENTO_CONFIRMADO("Pagamento Confirmado"),
-        EM_SEPARACAO("Em Separação"),
-        EM_TRANSPORTE("Em Transporte"),
-        ENTREGUE("Entregue"),
-        CANCELADO("Cancelado");
+        PAGAMENTO_REJEITADO("Pagamento Rejeitado"),
+        PAGAMENTO_CONFIRMADO("Pagamento com Sucesso"),
+        AGUARDANDO_RETIRADA("Aguardando Retirada"),
+        EM_TRANSITO("Em Trânsito"),
+        ENTREGUE("Entregue");
         
         private final String descricao;
         

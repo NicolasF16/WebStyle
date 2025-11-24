@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Status do Pedido - Estoquista</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header-actions {
+            margin-bottom: 30px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .pedido-info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .pedido-numero {
+            font-family: monospace;
+            font-size: 24px;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .status-atual {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-aguardando {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-rejeitado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-confirmado {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-retirada {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-transito {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .status-entregue {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #1f2937;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .page-header,
+            .pedido-info-card,
+            .form-card {
+                padding: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-actions">
+            <a href="/pedidos/estoquista" class="btn-back">
+                ← Voltar para Lista de Pedidos
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">✏️ Editar Status do Pedido</h1>
+            <p class="page-subtitle">Altere o status do pedido conforme o andamento da entrega</p>
+        </div>
+
+        <!-- Mensagens de erro -->
+        <div class="alert alert-error" th:if="${erro}" th:text="${erro}"></div>
+
+        <!-- Informações do Pedido -->
+        <div class="pedido-info-card">
+            <div class="info-section">
+                <div class="info-label">Número do Pedido</div>
+                <div class="pedido-numero" th:text="'#' + ${pedido.numeroPedido}"></div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-section">
+                    <div class="info-label">Data do Pedido</div>
+                    <div class="info-value" th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}"></div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-label">Valor Total</div>
+                    <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal, 1, 2)}"></div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-label">Status Atual</div>
+                    <div>
+                        <span class="status-atual"
+                              th:classappend="${pedido.status.name() == 'AGUARDANDO_PAGAMENTO'} ? 'status-aguardando' : 
+                                            (${pedido.status.name() == 'PAGAMENTO_REJEITADO'} ? 'status-rejeitado' :
+                                            (${pedido.status.name() == 'PAGAMENTO_CONFIRMADO'} ? 'status-confirmado' : 
+                                            (${pedido.status.name() == 'AGUARDANDO_RETIRADA'} ? 'status-retirada' : 
+                                            (${pedido.status.name() == 'EM_TRANSITO'} ? 'status-transito' : 'status-entregue'))))"
+                              th:text="${pedido.status.descricao}">
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Edição -->
+        <div class="form-card">
+            <h2 class="form-title">Alterar Status</h2>
+
+            <form th:action="@{/pedidos/estoquista/alterar-status/{id}(id=${pedido.id})}" method="post">
+                <div class="form-group">
+                    <label for="status" class="form-label">Novo Status *</label>
+                    <select id="status" name="status" class="form-select" required>
+                        <option value="" disabled selected>Selecione o novo status</option>
+                        <option th:each="status : ${todosStatus}" 
+                                th:value="${status.name()}" 
+                                th:text="${status.descricao}"
+                                th:selected="${status == pedido.status}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/pedidos/estoquista" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        💾 Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Confirmação antes de submeter
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const select = document.getElementById('status');
+            const statusText = select.options[select.selectedIndex].text;
+            
+            if (!confirm('Tem certeza que deseja alterar o status do pedido para "' + statusText + '"?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

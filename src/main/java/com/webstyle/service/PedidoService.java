@@ -5,6 +5,7 @@ import com.webstyle.repository.EnderecoRepository;
 import com.webstyle.repository.PedidoRepository;
 import com.webstyle.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,11 +168,12 @@ public class PedidoService {
     }
 
     /**
- * Lista todos os pedidos do sistema (para estoquista)
- */
-public List<Pedido> listarTodosPedidos() {
-    return pedidoRepository.findAll(Sort.by(Sort.Direction.DESC, "dataPedido"));
-}
+     * Lista todos os pedidos do sistema (para estoquista)
+     * Ordenados por data de pedido decrescente (mais recentes primeiro)
+     */
+    public List<Pedido> listarTodosPedidos() {
+        return pedidoRepository.findAll(Sort.by(Sort.Direction.DESC, "dataPedido"));
+    }
     
     /**
      * Lista pedidos do cliente

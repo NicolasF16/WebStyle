@@ -54,6 +54,26 @@
             background: #4b5563;
         }
 
+        /* Mensagens de sucesso e erro */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
         .pedidos-table {
             background: white;
             border-radius: 12px;
@@ -121,17 +141,22 @@
             color: #92400e;
         }
 
+        .status-rejeitado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
         .status-confirmado {
             background: #dbeafe;
             color: #1e40af;
         }
 
-        .status-separacao {
+        .status-retirada {
             background: #e0e7ff;
             color: #3730a3;
         }
 
-        .status-transporte {
+        .status-transito {
             background: #ddd6fe;
             color: #5b21b6;
         }
@@ -141,9 +166,21 @@
             color: #065f46;
         }
 
-        .status-cancelado {
-            background: #fee2e2;
-            color: #991b1b;
+        .btn-editar {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-editar:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
         }
 
         .empty-state {
@@ -196,6 +233,10 @@
             <a href="/main" class="btn-back">← Voltar</a>
         </div>
 
+        <!-- Mensagens de sucesso/erro -->
+        <div class="alert alert-success" th:if="${sucesso}" th:text="${sucesso}"></div>
+        <div class="alert alert-error" th:if="${erro}" th:text="${erro}"></div>
+
         <div class="pedidos-table">
             <table th:if="${pedidos != null and !pedidos.isEmpty()}">
                 <thead>
@@ -204,6 +245,7 @@
                         <th>Número do Pedido</th>
                         <th>Valor Total</th>
                         <th>Status</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -214,12 +256,17 @@
                         <td>
                             <span class="status-badge"
                                   th:classappend="${pedido.status.name() == 'AGUARDANDO_PAGAMENTO'} ? 'status-aguardando' : 
+                                                (${pedido.status.name() == 'PAGAMENTO_REJEITADO'} ? 'status-rejeitado' :
                                                 (${pedido.status.name() == 'PAGAMENTO_CONFIRMADO'} ? 'status-confirmado' : 
-                                                (${pedido.status.name() == 'EM_SEPARACAO'} ? 'status-separacao' : 
-                                                (${pedido.status.name() == 'EM_TRANSPORTE'} ? 'status-transporte' : 
-                                                (${pedido.status.name() == 'ENTREGUE'} ? 'status-entregue' : 'status-cancelado'))))"
+                                                (${pedido.status.name() == 'AGUARDANDO_RETIRADA'} ? 'status-retirada' : 
+                                                (${pedido.status.name() == 'EM_TRANSITO'} ? 'status-transito' : 'status-entregue'))))"
                                   th:text="${pedido.status.descricao}">
                             </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/pedidos/estoquista/editar/{id}(id=${pedido.id})}" class="btn-editar">
+                                ✏️ Editar Status
+                            </a>
                         </td>
                     </tr>
                 </tbody>
