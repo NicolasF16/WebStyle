@@ -165,6 +165,13 @@ public class PedidoService {
         
         return pedido;
     }
+
+    /**
+ * Lista todos os pedidos do sistema (para estoquista)
+ */
+public List<Pedido> listarTodosPedidos() {
+    return pedidoRepository.findAll(Sort.by(Sort.Direction.DESC, "dataPedido"));
+}
     
     /**
      * Lista pedidos do cliente

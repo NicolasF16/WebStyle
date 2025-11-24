@@ -16,6 +16,7 @@
         
         <ul>
             <li><a th:href="@{/produtos}">Listar Produtos</a></li>
+            <li th:if="${session.usuarioLogado.email == 'estoquista@gmail.com'}"><a th:href="@{/pedidos/estoquista}">Listar Pedidos</a></li>
             <!-- Estoquista não tem acesso a Gerenciar Usuários -->
         </ul>
         

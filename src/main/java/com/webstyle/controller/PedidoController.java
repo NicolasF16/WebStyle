@@ -2,6 +2,7 @@ package com.webstyle.controller;
 
 import com.webstyle.model.Cliente;
 import com.webstyle.model.Pedido;
+import com.webstyle.model.User;
 import com.webstyle.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,6 +42,30 @@ public class PedidoController {
         model.addAttribute("cliente", clienteLogado);
         
         return "pedido-lista";
+    }
+    
+    /**
+     * Lista todos os pedidos do sistema (somente para estoquista)
+     * URL: GET /pedidos/estoquista
+     */
+    @GetMapping("/estoquista")
+    public String listarPedidosEstoquista(HttpSession session, Model model) {
+        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
+        
+        if (usuarioLogado == null) {
+            return "redirect:/login";
+        }
+        
+        // Verifica se é o estoquista específico
+        if (!"estoquista@gmail.com".equals(usuarioLogado.getEmail())) {
+            return "redirect:/main";
+        }
+        
+        List<Pedido> pedidos = pedidoService.listarTodosPedidos();
+        
+        model.addAttribute("pedidos", pedidos);
+        
+        return "pedidos-estoquista";
     }
     
     /**
